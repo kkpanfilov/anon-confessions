@@ -1,25 +1,21 @@
 import { NotFound } from "@/components/screens/not-found/not-found.component.js";
 
+import { Layout } from "@/components/layout/layout.component.js";
+
 import { ROUTES } from "./routes.data.js";
 
 export class Router {
 	#routes;
 	#currentRoute;
+	#layout = null;
 
 	constructor() {
 		this.#routes = ROUTES;
 		this.#currentRoute = null;
 
 		this.#handleRouteChange();
-	}
-
-	getCurrentPath() {
-		return window.location.pathname;
-	}
-
-	render() {
-		const component = new this.#currentRoute.component;
-		document.querySelector("#app").innerHTML = component.render();
+		this.#handleLinks();
+		this.#handlePopstate();
 	}
 
 	#handleRouteChange() {
@@ -33,6 +29,42 @@ export class Router {
 		}
 
 		this.#currentRoute = route;
-		this.render();
+		this.#render();
+	}
+
+	#handleLinks() {
+		const allLinks = document.querySelectorAll("a");
+
+		for (const linkElem of allLinks) {
+			linkElem.addEventListener("click", e => {
+				e.preventDefault();
+
+				const path = e.target.getAttribute("href");
+				window.history.pushState({}, "", path);
+
+				this.#handleRouteChange();
+			});
+		}
+	}
+
+	#handlePopstate() {
+		window.addEventListener("popstate", () => {
+			this.#handleRouteChange();
+		});
+	}
+
+	getCurrentPath() {
+		return window.location.pathname;
+	}
+
+	#render() {
+		const component = new this.#currentRoute.component();
+
+		if (!this.#layout) {
+			this.#layout = new Layout({ router: this, children: component.render() });
+			document.querySelector("#app").innerHTML = this.#layout.render();
+		} else {
+			document.querySelector("main").innerHTML = component.render();
+		}
 	}
 }

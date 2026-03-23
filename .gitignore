@@ -3,8 +3,6 @@ dist/
 node_modules/
 build/
 
-.gitcommands
-
 # Logs
 logs
 *.log
