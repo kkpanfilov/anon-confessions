@@ -36,6 +36,7 @@ export class Router {
 		const allLinks = document.querySelectorAll("a");
 
 		for (const linkElem of allLinks) {
+			
 			linkElem.addEventListener("click", e => {
 				e.preventDefault();
 
@@ -66,5 +67,7 @@ export class Router {
 		} else {
 			document.querySelector("main").innerHTML = component.render();
 		}
+
+		
 	}
 }
