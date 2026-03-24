@@ -3,7 +3,7 @@ import { BaseScreen } from "@/core/component/base-screen.component.js";
 export class NotFound extends BaseScreen {
 	constructor() {
 		super({
-			title: "Not Found",
+			title: "404",
 		});
 	}
 

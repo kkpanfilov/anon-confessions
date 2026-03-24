@@ -1,4 +1,8 @@
 import { BaseScreen } from "@/core/component/base-screen.component.js";
+import renderService from "@/core/services/render.service.js";
+
+import styles from "./feed.module.scss";
+import template from "./feed.template.html";
 
 export class Feed extends BaseScreen {
 	constructor() {
@@ -8,6 +12,9 @@ export class Feed extends BaseScreen {
 	}
 
 	render() {
-		return "<div>Feed</div>";
+		console.log("Styles", styles); //
+		const htmlElement = renderService.htmlToElement(template, [], styles);
+		const htmlString = htmlElement.outerHTML;
+		return htmlString;
 	}
 }

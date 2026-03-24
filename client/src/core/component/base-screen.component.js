@@ -1,7 +1,18 @@
 export class BaseScreen {
-	constructor({ title }) {
-		document.title = `${title} | Anon Confessions`;
+	/**
+	 * Create a new BaseScreen instance
+	 * @param {string} title - title of the page
+	 */
+
+	constructor({ title } = {}) {
+		if (title) document.title = `${title} | Anon Confessions`;
 	}
 
-	render() {}
+	/**
+	 * Render the child component
+	 * @return {HTMLElement}
+	 */
+	render() {
+		throw new Error("Render method mist be implemented int the child class");
+	}
 }
