@@ -1,0 +1,51 @@
+@use "@/styles/variables";
+
+.header {
+	background-color: variables.$bg-header;
+	height: 50px;
+
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 0 20px;
+
+	&__logo {
+		display: flex;
+		align-items: center;
+
+		&-icon {
+			font-size: 30px;
+			margin-right: 10px;
+		}
+
+		&-title {
+			font-size: 20px;
+		}
+	}
+
+	&__add {
+		display: flex;
+		align-items: center;
+
+		&-link {
+			text-decoration: none;
+		}
+
+		&-button {
+			background-color: variables.$button-color;
+			border: none;
+			color: variables.$white;
+			cursor: pointer;
+			padding: 10px 35px;
+			border-radius: variables.$radius;
+		}
+	}
+}
+
+@media (max-width: 445px) {
+	.header {
+		&__logo-title {
+			display: none;
+		}
+	}
+}

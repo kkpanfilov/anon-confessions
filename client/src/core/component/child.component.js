@@ -1,4 +1,4 @@
-export class ChildComponent {
+export default class ChildComponent {
 	
 	/**
 	 * Render the child component

@@ -1,4 +1,8 @@
 import { BaseScreen } from "@/core/component/base-screen.component.js";
+import renderService from "@/core/services/render.service.js";
+
+import styles from "./confession.module.scss";
+import template from "./confession.template.html";
 
 export class Confession extends BaseScreen {
 	constructor() {
@@ -8,6 +12,7 @@ export class Confession extends BaseScreen {
 	}
 
 	render() {
-		return "<div>Confession</div>";
+		const htmlElement = renderService.htmlToElement(template, [], styles);
+		return htmlElement;
 	}
 }

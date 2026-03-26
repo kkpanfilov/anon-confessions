@@ -12,9 +12,7 @@ export class Feed extends BaseScreen {
 	}
 
 	render() {
-		console.log("Styles", styles); //
 		const htmlElement = renderService.htmlToElement(template, [], styles);
-		const htmlString = htmlElement.outerHTML;
-		return htmlString;
+		return htmlElement;
 	}
 }

@@ -36,6 +36,15 @@ export class JQuery {
 		return new JQuery(this.element.querySelector(selector));
 	}
 
+	append(elem) {
+		if (!(elem instanceof HTMLElement)) {
+			throw new Error("Invalid element");
+		}
+
+		this.element.appendChild(elem);
+		return this;
+	}
+
 	/**
 	 * Sets CSS styles to the current element.
 	 * @param {object<string,string>} styles - an object with CSS properties and values
@@ -60,4 +69,6 @@ export class JQuery {
 	text() {}
 }
 
-export const $ = new JQuery();
+export function $(elem) {
+	return new JQuery(elem);
+}

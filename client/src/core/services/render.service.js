@@ -7,7 +7,7 @@ class RenderService {
 	 * @returns {HTMLElement} The converted DOM element
 	 */
 
-	htmlToElement(html, components = [], styles) {
+	htmlToElement(html, components = {}, styles) {
 		const template = document.createElement("template");
 		template.innerHTML = html.trim();
 
@@ -17,7 +17,9 @@ class RenderService {
 			this.#applyModuleStyles(element, styles);
 		}
 
-		this.#replaceComponentsTags(element, components);
+		if (components) {
+			this.#replaceComponentsTags(element, components);
+		}
 
 		return element;
 	}
@@ -30,7 +32,7 @@ class RenderService {
 
 	#replaceComponentsTags(htmlElement, components) {
 		for (const key in components) {
-			const component = new components[key]();
+			const component = components[key];
 
 			if (!htmlElement.querySelector(key)) {
 				console.error("No components found");
@@ -40,7 +42,7 @@ class RenderService {
 			const allComponentsElements = htmlElement.querySelectorAll(key);
 
 			for (const componentElement of allComponentsElements) {
-				componentElement.replaceWith(component.render());
+				componentElement.replaceWith(component);
 			}
 		}
 	}
@@ -54,6 +56,7 @@ class RenderService {
 	#applyModuleStyles(htmlElement, styles) {
 		if (!htmlElement) return;
 
+		console.log(styles)
 		const applyStyles = element => {
 			for (const [key, value] of Object.entries(styles)) {
 				if (element.classList.contains(key)) {

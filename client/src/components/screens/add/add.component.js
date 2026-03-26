@@ -1,4 +1,8 @@
 import { BaseScreen } from "@/core/component/base-screen.component.js";
+import renderService from "@/core/services/render.service.js";
+
+import styles from "./add.module.scss";
+import template from "./add.template.html";
 
 export class Add extends BaseScreen {
 	constructor() {
@@ -8,6 +12,7 @@ export class Add extends BaseScreen {
 	}
 
 	render() {
-		return "<div>Add</div>";
+		const htmlElement = renderService.htmlToElement(template, [], styles);
+		return htmlElement;
 	}
 }

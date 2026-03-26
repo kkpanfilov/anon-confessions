@@ -1,10 +1,10 @@
 import ChildComponent from '@/core/component/child.component.js';
 import renderService from '@/core/services/render.service.js';
 
-import styles from './confession.module.scss';
-import template from './confession.template.html';
+import styles from './header.module.scss';
+import template from './header.template.html';
 
-export default class Confession extends ChildComponent {
+export default class Header extends ChildComponent {
   render() {
     this.element = renderService.htmlToElement(template, [], styles);
 

@@ -1,3 +1,5 @@
+import { $ } from "../jquery/jquery.lib.js";
+
 import { NotFound } from "@/components/screens/not-found/not-found.component.js";
 
 import { Layout } from "@/components/layout/layout.component.js";
@@ -20,7 +22,16 @@ export class Router {
 
 	#handleRouteChange() {
 		const path = this.getCurrentPath() || "/feed";
-		let route = this.#routes.find(item => item.path === path);
+
+		let route;
+
+		if (path === "/") {
+			window.history.pushState({}, "", "/feed");
+			this.#handleRouteChange()
+			return;
+		}
+
+		route = this.#routes.find(item => item.path === path);
 
 		if (!route) {
 			route = {
@@ -36,7 +47,6 @@ export class Router {
 		const allLinks = document.querySelectorAll("a");
 
 		for (const linkElem of allLinks) {
-			
 			linkElem.addEventListener("click", e => {
 				e.preventDefault();
 
@@ -63,9 +73,9 @@ export class Router {
 
 		if (!this.#layout) {
 			this.#layout = new Layout({ router: this, children: component.render() });
-			document.querySelector("#app").innerHTML = this.#layout.render();
+			$("#app").append(this.#layout.render());
 		} else {
-			document.querySelector("main").innerHTML = component.render();
+			$("main").append(component.render());
 		}
 	}
 }

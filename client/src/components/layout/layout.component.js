@@ -1,24 +1,27 @@
+import renderService from "@/core/services/render.service.js";
+
+import Header from "./header/header.component.js";
+
+import styles from "./layout.module.scss";
+import template from "./layout.template.html";
+
 export class Layout {
-  // #router;
+	// #router;
 	#children;
 
 	constructor({ router, children }) {
-		//this.#router = router;
+		// this.#router = router;
 		this.#children = children;
 	}
 
 	render() {
-		const headerHTML = `<header>
-    <a href="/feed">Feed</a>
-    <a href="/add">Add</a>
-    <a href="/confession">Confession</a>
-    </header>`;
+		const header = new Header().render();
 
-		return `
-    ${headerHTML}
-    <main>
-      ${this.#children}
-    </main>
-    `;
+		const htmlElement = renderService.htmlToElement(
+			template,
+			{ header, children: this.#children },
+			styles,
+		);
+		return htmlElement;
 	}
 }
