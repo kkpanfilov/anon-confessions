@@ -1,1 +1,7 @@
+@use "@/styles/variables";
 
+.main {
+	max-width: variables.$max-width;
+  margin: 50px auto 0 ;
+  padding: 0 10px;
+}

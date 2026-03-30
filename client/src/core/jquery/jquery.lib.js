@@ -1,4 +1,5 @@
 export class JQuery {
+	
 	/**
 	 * Creates a new instance of JQuery class.
 	 * @param {string|HTMLElement} elem - the element to query
@@ -36,12 +37,51 @@ export class JQuery {
 		return new JQuery(this.element.querySelector(selector));
 	}
 
+	/**
+	 * Appends an element to the current element.
+	 * @param {HTMLElement} elem - the element to append
+	 * @throws {Error} if the element is not an HTMLElement
+	 * @returns {JQuery} a new instance of JQuery class pointing to the modified element
+	 */
+
 	append(elem) {
 		if (!(elem instanceof HTMLElement)) {
 			throw new Error("Invalid element");
 		}
 
 		this.element.appendChild(elem);
+		return this;
+	}
+
+	/**
+	 * Inserts an element before the current element.
+	 * @param {HTMLElement} elem - the element to insert before
+	 * @throws {Error} if the element is not an HTMLElement
+	 * @returns {JQuery} a new instance of JQuery class pointing to the modified element
+	 */
+
+	before(elem) {
+		if (!(elem instanceof HTMLElement)) {
+			throw new Error("Invalid element");
+		}
+
+		this.element.before(elem);
+		return this;
+	}
+
+	/**
+	 * Replaces all children of the current element with the given element.
+	 * @param {HTMLElement} elem - the element to replace all children with
+	 * @throws {Error} if the element is not an HTMLElement
+	 * @returns {JQuery} a new instance of JQuery class pointing to the modified element
+	 */
+
+	replaceChildren(elem) {
+		if (!(elem instanceof HTMLElement)) {
+			throw new Error("Invalid element");
+		}
+
+		this.element.replaceChildren(elem);
 		return this;
 	}
 
@@ -65,8 +105,6 @@ export class JQuery {
 			return this;
 		}
 	}
-
-	text() {}
 }
 
 export function $(elem) {

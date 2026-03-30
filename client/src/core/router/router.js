@@ -27,7 +27,7 @@ export class Router {
 
 		if (path === "/") {
 			window.history.pushState({}, "", "/feed");
-			this.#handleRouteChange()
+			this.#handleRouteChange();
 			return;
 		}
 
@@ -50,7 +50,7 @@ export class Router {
 			linkElem.addEventListener("click", e => {
 				e.preventDefault();
 
-				const path = e.target.getAttribute("href");
+				const path = e.currentTarget.getAttribute("href");
 				window.history.pushState({}, "", path);
 
 				this.#handleRouteChange();
@@ -75,7 +75,7 @@ export class Router {
 			this.#layout = new Layout({ router: this, children: component.render() });
 			$("#app").append(this.#layout.render());
 		} else {
-			$("main").append(component.render());
+			$("main").replaceChildren(component.render());
 		}
 	}
 }

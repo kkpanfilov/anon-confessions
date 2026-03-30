@@ -56,7 +56,6 @@ class RenderService {
 	#applyModuleStyles(htmlElement, styles) {
 		if (!htmlElement) return;
 
-		console.log(styles)
 		const applyStyles = element => {
 			for (const [key, value] of Object.entries(styles)) {
 				if (element.classList.contains(key)) {
