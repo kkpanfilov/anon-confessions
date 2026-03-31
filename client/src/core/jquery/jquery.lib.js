@@ -1,5 +1,4 @@
 export class JQuery {
-	
 	/**
 	 * Creates a new instance of JQuery class.
 	 * @param {string|HTMLElement} elem - the element to query
@@ -86,6 +85,16 @@ export class JQuery {
 	}
 
 	/**
+	 * Clears all children of the current element.
+	 * @returns {JQuery} a new instance of JQuery class pointing to the modified element
+	 */
+
+	clear() {
+		this.element.innerHTML = "";
+		return this;
+	}
+
+	/**
 	 * Sets CSS styles to the current element.
 	 * @param {object<string,string>} styles - an object with CSS properties and values
 	 * @throws {Error} if any of the properties or values are invalid
@@ -104,6 +113,43 @@ export class JQuery {
 			this.element.style[property] = styles[property];
 			return this;
 		}
+	}
+
+	/**
+	 * Sets the text content of the current element.
+	 * @param {string} text - the text to set
+	 * @throws {Error} if the text is not a string
+	 * @returns {JQuery} a new instance of JQuery class pointing to the modified element
+	 */
+
+	text(text) {
+		if (typeof text !== "string") {
+			throw new Error("Invalid text");
+		}
+
+		this.element.textContent = text;
+		return this;
+	}
+
+	/**
+	 * Sets an attribute to the current element.
+	 * @param {string} attr - the attribute to set
+	 * @param {string} value - the value to set
+	 * @throws {Error} if the attribute or value are invalid
+	 * @returns {JQuery} a new instance of JQuery class pointing to the modified element
+	 */
+
+	attr(attr, value) {
+		if (typeof attr !== "string") {
+			throw new Error("Invalid attribute");
+		}
+
+		if (typeof value !== "string") {
+			throw new Error("Invalid value");
+		}
+
+		this.element.setAttribute(attr, value);
+		return this;
 	}
 }
 

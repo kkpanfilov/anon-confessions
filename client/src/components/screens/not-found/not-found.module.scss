@@ -1,1 +1,41 @@
+.not-found {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: #eaeaf0;
+	text-align: center;
+	padding: 20px;
 
+	&__content {
+		max-width: 400px;
+	}
+
+	&__title {
+		font-size: 96px;
+		font-weight: 700;
+		margin-bottom: 16px;
+		color: #ff6b6b;
+	}
+
+	&__subtitle {
+		font-size: 16px;
+		color: #a0a3b1;
+		margin-bottom: 24px;
+		line-height: 1.5;
+	}
+
+	&__button {
+		display: inline-block;
+		padding: 10px 20px;
+		background: #ff6b6b;
+		color: #fff;
+		border-radius: 8px;
+		text-decoration: none;
+		font-size: 14px;
+		transition: background 0.2s ease;
+
+		&:hover {
+			background: #ff5252;
+		}
+	}
+}
