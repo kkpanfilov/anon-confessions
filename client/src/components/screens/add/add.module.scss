@@ -1,1 +1,162 @@
+@use "@/styles/variables";
 
+.add {
+	display: flex;
+	flex-direction: column;
+	gap: 18px;
+	max-width: 700px;
+	margin: 0 auto;
+	padding: 30px 0 50px;
+	color: variables.$white;
+
+	&__header {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+	}
+
+	&__title {
+		font-size: 28px;
+		font-weight: 600;
+	}
+
+	&__subtitle {
+		font-size: 14px;
+		color: #a0a3b1;
+	}
+
+	&__form {
+		display: flex;
+		flex-direction: column;
+		gap: 14px;
+		background: #15181d;
+		border: 1px solid rgba(255, 255, 255, 0.06);
+		border-radius: 14px;
+		padding: 20px;
+	}
+
+	&__label {
+		font-size: 13px;
+		color: #c8cdd9;
+	}
+
+	&__textarea {
+		width: 100%;
+		min-height: 160px;
+		resize: vertical;
+		background: #101318;
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		border-radius: 10px;
+		padding: 12px 14px;
+		color: #eef1f7;
+		font-size: 14px;
+		line-height: 1.6;
+		outline: none;
+		transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+		&:focus {
+			border-color: rgba(99, 149, 199, 0.7);
+			box-shadow: 0 0 0 3px rgba(99, 149, 199, 0.18);
+		}
+
+		&::placeholder {
+			color: #6f7583;
+		}
+	}
+
+	&__meta {
+		display: flex;
+		justify-content: space-between;
+		font-size: 12px;
+		color: #7b808e;
+	}
+
+	&__hint,
+	&__count {
+		display: inline-flex;
+	}
+
+	&__note {
+		font-size: 12px;
+		color: #9aa0ad;
+		line-height: 1.5;
+	}
+
+	&__checkbox {
+		display: inline-flex;
+		align-items: center;
+		gap: 10px;
+		font-size: 12px;
+		color: #98a0b2;
+		cursor: pointer;
+	}
+
+	&__checkbox-label {
+		line-height: 1.4;
+	}
+
+	&__checkbox-input {
+		position: absolute;
+		opacity: 0;
+		pointer-events: none;
+	}
+
+	&__checkbox-box {
+		width: 16px;
+		height: 16px;
+		border-radius: 4px;
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		background: #121419;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		transition: all 0.2s ease;
+	}
+
+	&__checkbox-input:checked + &__checkbox-box {
+		background: variables.$button-color;
+		border-color: variables.$button-color;
+	}
+
+	&__checkbox-input:checked + &__checkbox-box::after {
+		content: "";
+		width: 6px;
+		height: 6px;
+		border-radius: 2px;
+		background: #fff;
+	}
+
+	&__actions {
+		display: flex;
+		justify-content: flex-end;
+	}
+
+	&__button {
+		background: variables.$button-color;
+		color: variables.$white;
+		border: none;
+		padding: 10px 24px;
+		border-radius: 10px;
+		font-weight: 600;
+		cursor: pointer;
+		transition: background 0.2s ease;
+	}
+
+	&__button:hover {
+		background: variables.$button-color-hover;
+	}
+}
+
+@media (max-width: 600px) {
+	.add {
+		padding-top: 20px;
+
+		&__actions {
+			justify-content: stretch;
+		}
+
+		&__button {
+			width: 100%;
+		}
+	}
+}
