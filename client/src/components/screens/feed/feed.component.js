@@ -4,7 +4,7 @@ import renderService from "@/core/services/render.service.js";
 import styles from "./feed.module.scss";
 import template from "./feed.template.html";
 
-import ConfessionItem from "@/components/ui/confession-item/confession-item.component.js";
+import ConfessionItem from "@/components/screens/feed/confession-item/confession-item.component.js";
 import { $ } from "@/core/jquery/jquery.lib.js";
 
 export class Feed extends BaseScreen {

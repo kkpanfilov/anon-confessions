@@ -1,10 +1,10 @@
 import ChildComponent from '@/core/component/child.component.js';
 import renderService from '@/core/services/render.service.js';
 
-import styles from './[FTName].module.scss';
-import template from './[FTName].template.html';
+import styles from './search.module.scss';
+import template from './search.template.html';
 
-export default class <FTName | pascalcase> extends ChildComponent {
+export default class Search extends ChildComponent {
   render() {
     this.element = renderService.htmlToElement(template, {}, styles);
 

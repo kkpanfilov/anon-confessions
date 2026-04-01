@@ -1,0 +1,81 @@
+@use "@/styles/variables";
+
+.search {
+	display: flex;
+	align-items: center;
+
+	&__form {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		background: #14171c;
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		border-radius: variables.$radius;
+		padding: 6px 12px;
+		transition:
+			border-color 0.2s ease,
+			box-shadow 0.2s ease;
+
+		&-label {
+			position: absolute;
+			width: 1px;
+			height: 1px;
+			padding: 0;
+			margin: -1px;
+			overflow: hidden;
+			clip: rect(0, 0, 0, 0);
+			border: 0;
+		}
+
+		&-icon {
+			font-size: 14px;
+			opacity: 0.7;
+		}
+
+		&-input {
+			background: transparent;
+			border: none;
+			color: variables.$white;
+			font-size: 13px;
+			min-width: 180px;
+			outline: none;
+		}
+
+		&-input::placeholder {
+			color: #8a8f9c;
+		}
+
+		&-button {
+			background: variables.$button-color;
+			color: variables.$white;
+			border: none;
+			border-radius: variables.$radius;
+			padding: 6px 14px;
+			font-size: 12px;
+			font-weight: 600;
+			cursor: pointer;
+			transition: background-color 0.2s ease;
+		}
+
+		&-button:hover {
+			background: variables.$button-color-hover;
+		}
+	}
+
+	&__form:focus-within {
+		border-color: rgba(99, 149, 199, 0.65);
+		box-shadow: 0 0 0 3px rgba(99, 149, 199, 0.15);
+	}
+}
+
+@media (max-width: 700px) {
+	.search__button {
+		display: none;
+	}
+}
+
+@media (max-width: 520px) {
+	.search__input {
+		min-width: 120px;
+	}
+}
