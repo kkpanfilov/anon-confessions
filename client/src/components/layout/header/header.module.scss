@@ -2,7 +2,7 @@
 
 .header {
 	background-color: variables.$bg-header;
-	height: 50px;
+	height: 60px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -17,7 +17,7 @@
 	.right-part {
 		display: flex;
 		align-items: center;
-		gap: 30px;
+		gap: 20px;
 	}
 }
 

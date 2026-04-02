@@ -11,7 +11,7 @@
 		background: #14171c;
 		border: 1px solid rgba(255, 255, 255, 0.08);
 		border-radius: variables.$radius;
-		padding: 6px 12px;
+		padding: 7px 12px;
 		transition:
 			border-color 0.2s ease,
 			box-shadow 0.2s ease;
@@ -45,6 +45,12 @@
 			color: #8a8f9c;
 		}
 
+		@media (max-width: 520px) {
+			&-input {
+				min-width: 120px;
+			}
+		}
+
 		&-button {
 			background: variables.$button-color;
 			color: variables.$white;
@@ -60,22 +66,16 @@
 		&-button:hover {
 			background: variables.$button-color-hover;
 		}
+
+		@media (max-width: 700px) {
+			&-button {
+				display: none;
+			}
+		}
 	}
 
 	&__form:focus-within {
 		border-color: rgba(99, 149, 199, 0.65);
 		box-shadow: 0 0 0 3px rgba(99, 149, 199, 0.15);
-	}
-}
-
-@media (max-width: 700px) {
-	.search__button {
-		display: none;
-	}
-}
-
-@media (max-width: 520px) {
-	.search__input {
-		min-width: 120px;
 	}
 }
