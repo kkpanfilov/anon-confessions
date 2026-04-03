@@ -19,6 +19,9 @@ lerna-debug.log*
 /coverage
 /.nyc_output
 
+# FT Templates
+/.fttemplates
+
 # Syncthing
 .stfolder
 .stignore

@@ -1,0 +1,27 @@
+{
+  "name": "anon-confessions-server",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "morgan": "^1.10.1",
+    "nodemon": "^3.1.14",
+    "prettier": "^3.8.1",
+    "prettier-plugin-sort-imports": "^1.8.11"
+  },
+  "dependencies": {
+    "@prisma/client": "^7.6.0",
+    "dotenv": "^17.4.0",
+    "express": "^5.2.1",
+    "pg": "^8.20.0",
+    "prisma": "^7.6.0"
+  },
+  "type": "module"
+}
