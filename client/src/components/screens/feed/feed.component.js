@@ -87,17 +87,15 @@ export class Feed extends BaseScreen {
 			},
 		];
 
-		const htmlElement = renderService.htmlToElement(
-			template,
-			{},
-			styles,
-		);
+		const htmlElement = renderService.htmlToElement(template, {}, styles);
 
-		$(htmlElement).clear();
+		const feedList = $(htmlElement).find("div[data-id='feed-list']");
 
-		confessions.forEach((confession) => {
+		feedList.clear();
+
+		confessions.forEach(confession => {
 			const confessionClone = new ConfessionItem(confession).render();
-			$(htmlElement).append(confessionClone);
+			feedList.append(confessionClone);
 		});
 
 		return htmlElement;

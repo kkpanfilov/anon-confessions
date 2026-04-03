@@ -1,3 +1,7 @@
+import { SERVER_URL } from "@/config/url.config.js";
+
+import { extractMessageError } from "./extract-message-error.js";
+
 /**
  * FetchQuery is a minimalistic library for handling API requests.
  * Fetch data from the API with provided options.
@@ -11,8 +15,6 @@
  * @param {Function} [options.onError=null] - Callback function to be called on error response.
  * @returns {Promise<{isLoading: boolean, error: string|null, data: any|null}>} - An object containing the loading state, error, and data from the response.
  */
-
-import { SERVER_URL } from "@/config/url.config.js";
 
 export async function FetchQuery({
 	path,
@@ -35,4 +37,31 @@ export async function FetchQuery({
 			...headers,
 		},
 	};
+
+	if (body) {
+		requestOptions.body = JSON.stringify(body);
+	}
+
+	try {
+		const response = await fetch(url, requestOptions);
+
+		if (response.ok) {
+			data = await response.json();
+
+			if (onSuccess) onSuccess(data);
+		} else {
+			const errorData = await response.json();
+			const errorMessage = extractMessageError(errorData);
+
+			if (onError) onError(errorMessage);
+		}
+	} catch (errorData) {
+		const errorMessage = extractMessageError(errorData);
+
+		if (errorData) onError(errorMessage);
+	} finally {
+		isLoading = false;
+	}
+
+	return { isLoading, error, data };
 }
