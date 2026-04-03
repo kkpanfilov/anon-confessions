@@ -13,12 +13,12 @@
 	padding: 14px 16px 16px;
 	border: 1px solid rgba(99, 149, 199, 0.45);
 	border-radius: variables.$radius;
+	box-shadow: 0 14px 36px rgba(0, 0, 0, 0.35);
 	background: linear-gradient(
 		140deg,
 		rgba(24, 26, 30, 0.98) 0%,
 		rgba(15, 17, 18, 0.98) 100%
 	);
-	box-shadow: 0 14px 36px rgba(0, 0, 0, 0.35);
 	color: variables.$white;
 	backdrop-filter: blur(3px);
 	transition: 0.4s;
@@ -33,6 +33,32 @@
 	&[data-state="active"] {
 		right: 15px;
 		transition: 0.4s;
+	}
+
+	&[data-notification-type="normal"] {
+		background: linear-gradient(
+			140deg,
+			rgba(24, 26, 30, 0.98) 0%,
+			rgba(15, 17, 18, 0.98) 100%
+		);
+	}
+
+	&[data-notification-type="success"] {
+		border-color: rgba(58, 193, 117, 0.5);
+		background: linear-gradient(
+			140deg,
+			rgba(17, 40, 30, 0.98) 0%,
+			rgba(12, 26, 20, 0.98) 100%
+		);
+	}
+
+	&[data-notification-type="error"] {
+		border-color: rgba(220, 95, 95, 0.5);
+		background: linear-gradient(
+			140deg,
+			rgba(46, 24, 29, 0.98) 0%,
+			rgba(30, 16, 19, 0.98) 100%
+		);
 	}
 
 	&-icon {
