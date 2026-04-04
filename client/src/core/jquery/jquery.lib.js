@@ -151,6 +151,37 @@ export class JQuery {
 		this.element.setAttribute(attr, value);
 		return this;
 	}
+
+	/**
+	 * Adds an event listener to the current element.
+	 * @param {string} event - the event to listen to
+	 * @param {function} callback - the function to call when the event is triggered
+	 * @returns {JQuery} a new instance of JQuery class pointing to the modified element
+	 */
+
+	on(event, callback) {
+		this.element.addEventListener(event, callback);
+		return this;
+	}
+
+	/**
+	 * Submits a form when the given element is a form.
+	 * @param {function} onSubmit - the function to call when the form is submitted
+	 * @throws {Error} if the element is not a form
+	 */
+
+	submit(onSubmit) {
+		if (this.element.tagName.toLowerCase() === "form") {
+			this.element.addEventListener("submit", e => {
+				e.preventDefault();
+				onSubmit(e);
+			});
+		} else {
+			throw new Error("Element is not a form");
+		}
+
+		return this;
+	}
 }
 
 export function $(elem) {

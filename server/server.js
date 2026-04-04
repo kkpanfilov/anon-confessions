@@ -2,20 +2,36 @@ import "dotenv/config";
 
 import express from "express";
 import morgan from "morgan";
+import cors from 'cors'
 
 import confessionsRoutes from "./app/confessions/confessions.routes.js";
 
-const app = express();
+import { prisma } from "./app/prisma.js";
 
+import { errorHandler, notFound } from "./app/middleware/error.middleware.js";
+
+const app = express();
 async function main() {
 	if (process.env.NODE_ENV === "development") app.use(morgan("dev"));
 
-	const port = process.env.PORT || 3000;
-
+	const port = process.env.PORT || 4200;
+	
+	app.use(cors())
 	app.use(express.json());
 	app.use("/api/confessions", confessionsRoutes);
+
+	app.use(notFound)
+	app.use(errorHandler)
 
 	app.listen(port, () => console.log(`Server is running on port ${port}`));
 }
 
-main();
+main()
+	.then(async () => {
+		await prisma.$disconnect();
+	})
+	.catch(async e => {
+		console.error(e);
+		await prisma.$disconnect();
+		process.exit(1);
+	});

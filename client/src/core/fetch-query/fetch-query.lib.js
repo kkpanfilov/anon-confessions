@@ -2,6 +2,8 @@ import { SERVER_URL } from "@/config/url.config.js";
 
 import { extractMessageError } from "./extract-message-error.js";
 
+import NotificationsService from "../services/notifications.service.js";
+
 /**
  * FetchQuery is a minimalistic library for handling API requests.
  * Fetch data from the API with provided options.
@@ -18,9 +20,9 @@ import { extractMessageError } from "./extract-message-error.js";
 
 export async function FetchQuery({
 	path,
+	method = "GET",
 	body = null,
 	headers = {},
-	method = "GET",
 	onSuccess = null,
 	onError = null,
 }) {
@@ -42,6 +44,8 @@ export async function FetchQuery({
 		requestOptions.body = JSON.stringify(body);
 	}
 
+	const notificationService = NotificationsService;
+
 	try {
 		const response = await fetch(url, requestOptions);
 
@@ -54,11 +58,23 @@ export async function FetchQuery({
 			const errorMessage = extractMessageError(errorData);
 
 			if (onError) onError(errorMessage);
+
+			notificationService.show({
+				type: "error",
+				title: "Error",
+				message: errorMessage,
+			});
 		}
 	} catch (errorData) {
 		const errorMessage = extractMessageError(errorData);
 
-		if (errorData) onError(errorMessage);
+		if (onError) onError(errorMessage);
+
+		notificationService.show({
+			type: "error",
+			title: "Error",
+			message: errorMessage,
+		});
 	} finally {
 		isLoading = false;
 	}

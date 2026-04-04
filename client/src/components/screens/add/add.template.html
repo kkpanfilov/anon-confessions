@@ -9,28 +9,19 @@
     <textarea
       class="addTextarea"
       id="confession"
-      name="confession"
+      name="content"
       placeholder="I never told anyone that..."
       rows="7"
+      maxlength="500"
     ></textarea>
 
     <div class="addMeta">
       <span class="addHint">Max 500 characters</span>
-      <span class="addCount">0 / 500</span>
+      <span class="addCount" data-id="character-counter">0 / 500</span>
     </div>
-
-    <div class="addNote">
-      We remove names, doxxing, and threats. Everything else stays anonymous.
-    </div>
-
-    <label class="addCheckbox">
-      <input type="checkbox" class="addCheckboxInput" />
-      <span class="addCheckboxBox"></span>
-      <span class="addCheckboxLabel">I understand this post is public.</span>
-    </label>
 
     <div class="addActions">
-      <button type="button" class="addButton">Publish confession</button>
+      <button type="submut" class="addButton">Publish confession</button>
     </div>
   </form>
 </div>

@@ -7,11 +7,9 @@ import styles from "./layout.module.scss";
 import template from "./layout.template.html";
 
 export class Layout {
-	// #router;
 	#children;
 
-	constructor({ router, children }) {
-		// this.#router = router;
+	constructor({ children }) {
 		this.#children = children;
 	}
 

@@ -1,9 +1,15 @@
 import express from "express";
 
-import { getConfessions } from "./confessions.controller.js";
+import {
+	getConfessionById,
+	getLatestConfessions,
+	createConfession,
+} from "./confessions.controller.js";
 
 const router = express.Router();
 
-router.route("/").get(getConfessions);
+router.route("/latest").get(getLatestConfessions);
+router.route("/create").post(createConfession);
+router.route("/:id").get(getConfessionById);
 
 export default router;

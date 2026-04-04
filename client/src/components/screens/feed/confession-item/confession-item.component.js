@@ -9,10 +9,12 @@ import { timeAgo } from "@/utils/timeAgo.js";
 
 export default class ConfessionItem extends ChildComponent {
 	constructor(confession) {
-    super();
+		super();
 
 		this.id = confession.id;
-		this.date = confession.date;
+		this.createdAt = Math.round(
+			new Date(confession.createdAt).getTime() / 1000,
+		);
 		this.content = confession.content;
 		this.likes = confession.likes;
 	}
@@ -20,7 +22,8 @@ export default class ConfessionItem extends ChildComponent {
 	render() {
 		this.element = renderService.htmlToElement(template, [], styles);
 
-    $(this.element).attr('href', `/confession/${this.id}`)
+		console.log(this);
+		$(this.element).attr("href", `/confession/${this.id}`);
 		$(this.element)
 			.find('div[data-id="confession-content"]')
 			.text(this.content);
@@ -29,7 +32,7 @@ export default class ConfessionItem extends ChildComponent {
 			.text(String(this.likes));
 		$(this.element)
 			.find('span[data-id="confession-time"]')
-			.text(timeAgo(this.date));
+			.text(timeAgo(this.createdAt));
 
 		return this.element;
 	}

@@ -31,7 +31,7 @@ export class Router {
 			return;
 		}
 
-		route = this.#routes.find(item => item.path === path);
+		route = this.#routes.find(item => this.#matchPath(item.path, path));
 
 		if (!route) {
 			route = {
@@ -62,6 +62,14 @@ export class Router {
 		window.addEventListener("popstate", () => {
 			this.#handleRouteChange();
 		});
+	}
+
+	#matchPath(routePath, currentPath) {
+		const a = routePath.split("/").filter(Boolean);
+		const b = currentPath.split("/").filter(Boolean);
+		if (a.length !== b.length) return false;
+
+		return a.every((seg, i) => seg.startsWith(":") || seg === b[i]);
 	}
 
 	getCurrentPath() {
