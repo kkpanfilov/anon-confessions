@@ -69,6 +69,11 @@ export const createConfession = asyncHandler(async (req, res) => {
 		throw new Error("Confession content required");
 	}
 
+	if (!body.title) {
+		res.status(400);
+		throw new Error("Confession title required");
+	}
+
 	const token = generateToken();
 	const tokenHash = hashToken(token);
 

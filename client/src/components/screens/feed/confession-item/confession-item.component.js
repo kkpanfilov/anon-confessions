@@ -22,7 +22,6 @@ export default class ConfessionItem extends ChildComponent {
 	render() {
 		this.element = renderService.htmlToElement(template, [], styles);
 
-		console.log(this);
 		$(this.element).attr("href", `/confession/${this.id}`);
 		$(this.element)
 			.find('div[data-id="confession-content"]')

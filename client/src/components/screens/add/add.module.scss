@@ -9,23 +9,23 @@
 	padding: 30px 0 50px;
 	color: variables.$white;
 
-	&__header {
+	&-header {
 		display: flex;
 		flex-direction: column;
 		gap: 8px;
 	}
 
-	&__title {
+	&-title {
 		font-size: 28px;
 		font-weight: 600;
 	}
 
-	&__subtitle {
+	&-subtitle {
 		font-size: 14px;
 		color: #a0a3b1;
 	}
 
-	&__form {
+	&-form {
 		display: flex;
 		flex-direction: column;
 		gap: 14px;
@@ -35,12 +35,35 @@
 		padding: 20px;
 	}
 
-	&__label {
+	&-label {
 		font-size: 13px;
 		color: #c8cdd9;
 	}
 
-	&__textarea {
+	&-input {
+		width: 100%;
+		background: #101318;
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		border-radius: 10px;
+		padding: 12px 14px;
+		color: #eef1f7;
+		font-size: 14px;
+		outline: none;
+		transition:
+			border-color 0.2s ease,
+			box-shadow 0.2s ease;
+
+		&:focus {
+			border-color: rgba(99, 149, 199, 0.7);
+			box-shadow: 0 0 0 3px rgba(99, 149, 199, 0.18);
+		}
+
+		&::placeholder {
+			color: #6f7583;
+		}
+	}
+
+	&-textarea {
 		width: 100%;
 		min-height: 160px;
 		resize: vertical;
@@ -52,7 +75,9 @@
 		font-size: 14px;
 		line-height: 1.6;
 		outline: none;
-		transition: border-color 0.2s ease, box-shadow 0.2s ease;
+		transition:
+			border-color 0.2s ease,
+			box-shadow 0.2s ease;
 
 		&:focus {
 			border-color: rgba(99, 149, 199, 0.7);

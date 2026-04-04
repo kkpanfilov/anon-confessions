@@ -6,21 +6,32 @@
 	color: #eaeaf0;
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 	width: 400px;
-	height: 150px;
+	height: 170px;
 	transition: 0.3s;
 
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
 
-	&__content {
+	&:hover {
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+		transform: scale(1.05);
+		transition: 0.3s;
+	}
+
+	&-title {
+		font-size: 18px;
+		font-weight: 600;
+	}
+
+	&-content {
 		font-size: 15px;
 		line-height: 1.5;
 		margin-bottom: 12px;
 		word-wrap: break-word;
 	}
 
-	&__footer {
+	&-footer {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
@@ -28,11 +39,11 @@
 		color: #a0a3b1;
 	}
 
-	&__time {
+	&-time {
 		opacity: 0.8;
 	}
 
-	&__like {
+	&-like {
 		background: transparent;
 		border: none;
 		color: #a0a3b1;
@@ -47,13 +58,7 @@
 		}
 	}
 
-	&__likes {
+	&-likes {
 		font-size: 13px;
 	}
-}
-
-.confession:hover {
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-	transform: scale(1.05);
-	transition: 0.3s;
 }

@@ -36,6 +36,7 @@ module.exports = {
 	output: {
 		filename: isDev ? "[name].js" : "[name].[contenthash].js",
 		path: path.resolve(__dirname, "dist"),
+		publicPath: "/", // fix confession/:id
 		assetModuleFilename: "public/[name].[contenthash][ext][query]",
 	},
 	resolve: {
