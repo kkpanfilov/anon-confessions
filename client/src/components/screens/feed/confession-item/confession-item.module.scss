@@ -1,5 +1,7 @@
+@use "@/styles/variables";
+
 .confession {
-	background: #1e1f24;
+	background: variables.$bg-block;
 	border-radius: 12px;
 	padding: 16px;
 	margin-bottom: 12px;
