@@ -21,7 +21,6 @@ export class Router {
 	}
 
 	#handleRouteChange() {
-		console.log("Handle route change");
 		const path = this.getCurrentPath() || "/feed";
 
 		let route;
@@ -33,7 +32,6 @@ export class Router {
 		}
 
 		route = this.#routes.find(item => this.#matchPath(item.path, path));
-		console.log("Route:", route);
 
 		if (!route) {
 			route = {
@@ -46,7 +44,6 @@ export class Router {
 	}
 
 	#handleLinks() {
-		console.log("Handle links");
 		const allLinks = document.querySelectorAll("a");
 
 		for (const linkElem of allLinks) {
@@ -62,7 +59,6 @@ export class Router {
 	}
 
 	#handlePopstate() {
-		console.log("Handle popstate");
 		window.addEventListener("popstate", () => {
 			this.#handleRouteChange();
 		});

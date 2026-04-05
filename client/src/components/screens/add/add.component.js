@@ -3,6 +3,7 @@ import { BaseScreen } from "@/core/component/base-screen.component.js";
 import formService from "@/core/services/form.service.js";
 import renderService from "@/core/services/render.service.js";
 import notificationsService from "@/core/services/notifications.service.js";
+import { ConfessionsService } from "@/api/confessions.service.js";
 
 import { $ } from "@/core/jquery/jquery.lib.js";
 
@@ -14,6 +15,8 @@ export class Add extends BaseScreen {
 		super({
 			title: "New confession",
 		});
+
+		this.confessionsService = new ConfessionsService();
 	}
 
 	#handleSubmit = event => {
@@ -28,7 +31,15 @@ export class Add extends BaseScreen {
 			return;
 		}
 
-		
+		this.confessionsService.createConfession(data).then(result => {
+			notificationsService.show({
+				type: "success",
+				title: "Success",
+				message: "Confession created successfully",
+			});
+
+			window.location.href = `/confession/${result.id}`;
+		});
 	};
 
 	render() {
