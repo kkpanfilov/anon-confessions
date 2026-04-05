@@ -1,3 +1,5 @@
+@use "@/styles/variables";
+
 .not-found {
 	display: flex;
 	align-items: center;
@@ -29,7 +31,7 @@
 		padding: 10px 20px;
 		background: #ff6b6b;
 		color: #fff;
-		border-radius: 8px;
+		border-radius: variables.$radius;
 		text-decoration: none;
 		font-size: 14px;
 		transition: background 0.2s ease;

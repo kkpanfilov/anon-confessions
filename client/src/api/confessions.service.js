@@ -28,6 +28,25 @@ export class ConfessionsService {
 		return data;
 	}
 
+	async getConfessionById(id) {
+		const result = await FetchQuery({
+			path: `${this.#BASE_URL}/${id}`,
+			method: "GET",
+		});
+
+		const data = result.data;
+
+		if (!data) {
+			this.notificationService.show({
+				type: "error",
+				title: "Error",
+				message: "Failed to get confession",
+			});
+		}
+
+		return data;
+	}
+
 	async createConfession(body) {
 		const result = await FetchQuery({
 			path: `${this.#BASE_URL}/create`,
@@ -42,6 +61,25 @@ export class ConfessionsService {
 				type: "error",
 				title: "Error",
 				message: "Failed to create confession",
+			});
+		}
+
+		return data;
+	}
+
+	async likeConfession(id) {
+		const result = await FetchQuery({
+			path: `${this.#BASE_URL}/${id}/like`,
+			method: "PATCH",
+		});
+
+		const data = result.data;
+
+		if (!data) {
+			this.notificationService.show({
+				type: "error",
+				title: "Error",
+				message: "Failed to like confession",
 			});
 		}
 

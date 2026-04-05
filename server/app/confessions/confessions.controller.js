@@ -17,6 +17,13 @@ import { hashToken } from "../utils/crypto/hashToken.js";
 export const getConfessionById = asyncHandler(async (req, res) => {
 	const confession = await prisma.confession.findUnique({
 		where: { id: req.params.id },
+		select: {
+			id: true,
+			createdAt: true,
+			title: true,
+			content: true,
+			likes: true,
+		},
 	});
 
 	if (!confession) {
@@ -44,6 +51,7 @@ export const getLatestConfessions = asyncHandler(async (req, res) => {
 		select: {
 			id: true,
 			createdAt: true,
+			title: true,
 			content: true,
 			likes: true,
 		},
@@ -88,4 +96,39 @@ export const createConfession = asyncHandler(async (req, res) => {
 	});
 
 	res.status(201).json(confession);
+});
+
+/**
+ * @description Like a confession.
+ * @function likeConfession
+ * @param {IncomingMessage} req - The incoming HTTP request.
+ * @param {ServerResponse} res - The outgoing HTTP response.
+ * @throws {Error} - If the confession is not found.
+ * @returns {Promise<Confession>} - A promise that resolves or rejects with an error.
+ */
+
+export const likeConfession = asyncHandler(async (req, res) => {
+	const confession = await prisma.confession.findUnique({
+		where: { id: req.params.id },
+	});
+
+	if (!confession) {
+		res.status(404);
+		throw new Error("Confession not found");
+	}
+
+	const updatedConfession = await prisma.confession.update({
+		where: { id: confession.id },
+		data: {
+			likes: {
+				increment: 1,
+			},
+		},
+		select: {
+			id: true,
+			likes: true,
+		},
+	});
+
+	res.status(200).json(updatedConfession);
 });

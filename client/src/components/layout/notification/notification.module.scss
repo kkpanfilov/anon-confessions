@@ -25,9 +25,7 @@
 
 	@media (max-width: 640px) {
 		top: 70px;
-		right: 10px;
-		left: 10px;
-		width: auto;
+		max-width: 300px;
 	}
 
 	&[data-state="active"] {

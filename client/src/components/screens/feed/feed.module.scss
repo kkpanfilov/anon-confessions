@@ -42,10 +42,4 @@
 		justify-content: center;
 		gap: 25px;
 	}
-
-	@media (max-width: 600px) {
-		&-list {
-			justify-content: flex-start;
-		}
-	}
 }

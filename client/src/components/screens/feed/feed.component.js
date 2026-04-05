@@ -15,7 +15,7 @@ export class Feed extends BaseScreen {
 		super({
 			title: "Feed",
 		});
-		this.confessionService = new ConfessionsService();
+		this.confessionsService = new ConfessionsService();
 	}
 
 	render() {
@@ -25,7 +25,7 @@ export class Feed extends BaseScreen {
 
 		feedList.clear();
 
-		this.confessionService
+		this.confessionsService
 			.getLatestConfessions()
 			.then((list) => {
 				list.forEach(confession => {

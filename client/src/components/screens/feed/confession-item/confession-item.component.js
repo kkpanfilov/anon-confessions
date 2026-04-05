@@ -15,6 +15,7 @@ export default class ConfessionItem extends ChildComponent {
 		this.createdAt = Math.round(
 			new Date(confession.createdAt).getTime() / 1000,
 		);
+		this.title = confession.title;
 		this.content = confession.content;
 		this.likes = confession.likes;
 	}
@@ -23,6 +24,9 @@ export default class ConfessionItem extends ChildComponent {
 		this.element = renderService.htmlToElement(template, [], styles);
 
 		$(this.element).attr("href", `/confession/${this.id}`);
+		$(this.element)
+			.find('div[data-id="confession-title"]')
+			.text(this.content);
 		$(this.element)
 			.find('div[data-id="confession-content"]')
 			.text(this.content);

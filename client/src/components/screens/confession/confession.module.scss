@@ -9,6 +9,12 @@
 	padding: 30px 0 50px;
 	color: variables.$white;
 
+	@media (max-width: 600px) {
+		& {
+			padding-top: 20px;
+		}
+	}
+
 	&-header {
 		display: flex;
 		flex-direction: column;
@@ -43,162 +49,160 @@
 				font-size: 32px;
 				font-weight: 600;
 				line-height: 1.15;
+
+				@media (max-width: 600px) {
+					& {
+						font-size: 26px;
+					}
+				}
 			}
 		}
 	}
-}
 
-.confessionLayout {
-	display: grid;
-	grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
-	gap: 20px;
-	align-items: start;
-}
+	&-layout {
+		display: flex;
+		gap: 20px;
+		align-items: start;
 
-.confessionCard {
-	background: variables.$bg-block;
-	border: 1px solid rgba(255, 255, 255, 0.06);
-	border-radius: 16px;
-}
+		&-card {
+			display: flex;
+			flex-direction: column;
+			gap: 24px;
+			padding: 24px;
+			min-width: 100%;
+			box-shadow: 0 18px 40px rgba(0, 0, 0, 0.2);
+			background: variables.$bg-block;
+			border: 1px solid rgba(255, 255, 255, 0.06);
+			border-radius: variables.$radius;
 
-.confessionCard {
-	display: flex;
-	flex-direction: column;
-	gap: 24px;
-	padding: 24px;
-	box-shadow: 0 18px 40px rgba(0, 0, 0, 0.2);
-}
+			@media (max-width: 600px) {
+				& {
+					padding: 18px;
+				}
+			}
 
-.confessionCardMeta {
-	display: flex;
-	align-items: center;
-	gap: 10px;
-	font-size: 12px;
-	color: #7b808e;
-}
+			&-meta {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				font-size: 12px;
+				color: #7b808e;
 
-.confessionCardMetaDivider {
-	width: 4px;
-	height: 4px;
-	border-radius: 50%;
-	background: currentColor;
-	opacity: 0.65;
-}
+				&-divider {
+					width: 4px;
+					height: 4px;
+					border-radius: 50%;
+					background: currentColor;
+					opacity: 0.65;
+				}
+			}
 
-.confessionContent {
-	font-size: 18px;
-	line-height: 1.8;
-	color: #eef1f7;
-	word-break: break-word;
-}
+			&-content {
+				font-size: 18px;
+				line-height: 1.8;
+				color: #eef1f7;
+				word-break: break-word;
 
-.confessionFooter {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 16px;
-	padding-top: 18px;
-	border-top: 1px solid rgba(255, 255, 255, 0.06);
-}
+				@media (max-width: 600px) {
+					& {
+						font-size: 16px;
+						line-height: 1.7;
+					}
+				}
+			}
 
-.confessionLike,
-.confessionAction {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	gap: 8px;
-	border: none;
-	border-radius: 10px;
-	font-size: 14px;
-	font-weight: 600;
-	cursor: pointer;
-	transition:
-		background 0.2s ease,
-		color 0.2s ease,
-		border-color 0.2s ease;
-}
+			&-footer {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 16px;
+				padding-top: 18px;
+				border-top: 1px solid rgba(255, 255, 255, 0.06);
 
-.confessionLike {
-	padding: 10px 16px;
-	background: rgba(255, 255, 255, 0.05);
-	color: #f2b3bb;
+				@media (max-width: 600px) {
+					& {
+						flex-direction: column;
+						align-items: stretch;
+					}
+				}
 
-	&:hover {
-		background: rgba(255, 255, 255, 0.09);
-	}
-}
+				&-like {
+					padding: 10px 16px;
+					background: rgba(255, 255, 255, 0.05);
+					color: #f2b3bb;
 
-.confessionLikeIcon {
-	font-size: 15px;
-	line-height: 1;
-}
+					&:hover {
+						background: rgba(255, 255, 255, 0.09);
+					}
 
-.confessionActions {
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: flex-end;
-	gap: 10px;
-}
+					&-icon {
+						font-size: 15px;
+						line-height: 1;
+					}
 
-.confessionAction {
-	padding: 10px 18px;
-	background: variables.$button-color;
-	color: variables.$white;
+					@media (max-width: 600px) {
+						& {
+							width: 100%;
+						}
+					}
+				}
 
-	&:hover {
-		background: variables.$button-color-hover;
-	}
-}
+				&-like[data-status="liked"] {
+					background: rgba(161, 36, 36, 0.325);
 
-.confessionActionGhost {
-	background: transparent;
-	border: 1px solid rgba(255, 255, 255, 0.12);
-	color: #c8cdd9;
+					&:hover {
+						background:rgba(205, 63, 63, 0.325);
+					}
+				}
 
-	&:hover {
-		background: rgba(255, 255, 255, 0.05);
-	}
-}
+				&-like {
+					display: inline-flex;
+					align-items: center;
+					justify-content: center;
+					gap: 8px;
+					border: none;
+					border-radius: variables.$radius;
+					font-size: 14px;
+					font-weight: 600;
+					cursor: pointer;
+					transition:
+						background 0.2s ease,
+						color 0.2s ease,
+						border-color 0.2s ease;
+				}
 
-@media (max-width: 860px) {
-	.confessionLayout {
-		grid-template-columns: 1fr;
-	}
+				&-actions {
+					display: flex;
+					flex-wrap: wrap;
+					justify-content: flex-end;
+					gap: 10px;
 
-	.confessionAside {
-		order: 2;
-	}
-}
+					@media (max-width: 600px) {
+						& {
+							justify-content: stretch;
+						}
+					}
 
-@media (max-width: 600px) {
-	.confession {
-		padding-top: 20px;
-	}
+					&-button {
+						padding: 10px 18px;
+						background: variables.$button-color;
+						color: variables.$white;
+						border-radius: variables.$radius;
+						transition: 0.2s ease;
 
-	.confessionTitle {
-		font-size: 26px;
-	}
+						&:hover {
+							background: variables.$button-color-hover;
+							transition: 0.2s ease;
+						}
 
-	.confessionCard {
-		padding: 18px;
-	}
-
-	.confessionContent {
-		font-size: 16px;
-		line-height: 1.7;
-	}
-
-	.confessionFooter {
-		flex-direction: column;
-		align-items: stretch;
-	}
-
-	.confessionActions {
-		justify-content: stretch;
-	}
-
-	.confessionAction,
-	.confessionLike {
-		width: 100%;
+						@media (max-width: 600px) {
+							& {
+								width: 100%;
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 }

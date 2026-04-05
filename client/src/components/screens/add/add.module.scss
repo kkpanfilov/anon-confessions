@@ -31,7 +31,7 @@
 		gap: 14px;
 		background: variables.$bg-block;
 		border: 1px solid rgba(255, 255, 255, 0.06);
-		border-radius: 14px;
+		border-radius: variables.$radius;
 		padding: 20px;
 	}
 
@@ -44,7 +44,7 @@
 		width: 100%;
 		background: #101318;
 		border: 1px solid rgba(255, 255, 255, 0.08);
-		border-radius: 10px;
+		border-radius: variables.$radius;
 		padding: 12px 14px;
 		color: #eef1f7;
 		font-size: 14px;
@@ -69,7 +69,7 @@
 		resize: vertical;
 		background: #101318;
 		border: 1px solid rgba(255, 255, 255, 0.08);
-		border-radius: 10px;
+		border-radius: variables.$radius;
 		padding: 12px 14px;
 		color: #eef1f7;
 		font-size: 14px;
@@ -161,7 +161,7 @@
 		color: variables.$white;
 		border: none;
 		padding: 10px 24px;
-		border-radius: 10px;
+		border-radius: variables.$radius;
 		font-weight: 600;
 		cursor: pointer;
 		transition: background 0.2s ease;
