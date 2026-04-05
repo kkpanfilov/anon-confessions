@@ -38,7 +38,9 @@ export class Add extends BaseScreen {
 				message: "Confession created successfully",
 			});
 
-			window.location.href = `/confession/${result.id}`;
+			setTimeout(() => {
+				window.location.href = `/confession/${result.id}`;
+			}, 1000);
 		});
 	};
 

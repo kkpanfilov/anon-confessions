@@ -34,6 +34,7 @@ export async function FetchQuery({
 
 	const requestOptions = {
 		method,
+		credentials: "include",
 		headers: {
 			"Content-Type": "application/json",
 			...headers,

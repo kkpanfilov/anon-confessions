@@ -15,6 +15,21 @@ model Confession {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
+  likedBy   ConfessionLike[]
+
   @@index([createdAt(sort: Desc)])
   @@index([likes(sort: Desc)])
 }
+
+model ConfessionLike {
+  id           String     @id @default(uuid()) @db.Uuid
+  confessionId String     @db.Uuid
+  voterHash    String     @db.VarChar(64)
+  createdAt    DateTime   @default(now()) @map("created_at")
+
+  confession   Confession @relation(fields: [confessionId], references: [id], onDelete: Cascade)
+
+  @@unique([confessionId, voterHash])
+  @@index([confessionId])
+}
+

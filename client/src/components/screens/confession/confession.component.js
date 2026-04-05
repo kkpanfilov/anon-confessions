@@ -59,37 +59,55 @@ export class Confession extends BaseScreen {
 		});
 	};
 
-	#handleLike = (htmlElement, likeButton) => {
+	#likeConfession = (htmlElement, likedConfessions, likeButton) => {
+		this.confessionsService.likeConfession(this.confessionId).then(result => {
+			notificationsService.show({
+				type: "success",
+				title: "Success",
+				message: "Confession liked successfully",
+			});
+
+			likedConfessions.push(this.confessionId);
+
+			this.storageService.setItem(
+				"likedConfessions",
+				JSON.stringify(likedConfessions),
+			);
+
+			$(htmlElement)
+				.find('span[data-id="confession-likes"]')
+				.text(String(result.likes));
+
+			likeButton.attr("data-status", "liked");
+		});
+	};
+
+	#unlikeConfession = (htmlElement, likedConfessions, likeButton) => {
+		this.confessionsService.unlikeConfession(this.confessionId).then(result => {
+			const unlikedConfession = likedConfessions.indexOf(this.confessionId);
+
+			likedConfessions.splice(unlikedConfession, 1);
+
+			this.storageService.setItem(
+				"likedConfessions",
+				JSON.stringify(likedConfessions),
+			);
+
+			$(htmlElement)
+				.find('span[data-id="confession-likes"]')
+				.text(String(result.likes));
+
+			likeButton.attr("data-status", "unliked");
+		});
+	};
+
+	#handleLikeButton = (htmlElement, likeButton) => {
 		const likedConfessions =
 			JSON.parse(this.storageService.getItem("likedConfessions")) || [];
 
-		if (likedConfessions.includes(this.confessionId)) {
-			notificationsService.show({
-				type: "error",
-				title: "Error",
-				message: "You already liked this confession",
-			});
-		} else {
-			this.confessionsService.likeConfession(this.confessionId).then(result => {
-				notificationsService.show({
-					type: "success",
-					title: "Success",
-					message: "Confession liked successfully",
-				});
-
-				likedConfessions.push(this.confessionId);
-				this.storageService.setItem(
-					"likedConfessions",
-					JSON.stringify(likedConfessions),
-				);
-
-				$(htmlElement)
-					.find('span[data-id="confession-likes"]')
-					.text(String(result.likes));
-
-				likeButton.attr("data-status", "liked");
-			});
-		}
+		if (likedConfessions.includes(this.confessionId))
+			this.#unlikeConfession(htmlElement, likedConfessions, likeButton);
+		else this.#likeConfession(htmlElement, likedConfessions, likeButton);
 	};
 
 	render() {
@@ -109,7 +127,7 @@ export class Confession extends BaseScreen {
 
 		shareButton.on("click", this.#handleShare);
 		likeButton.on("click", () => {
-			this.#handleLike(htmlElement, likeButton);
+			this.#handleLikeButton(htmlElement, likeButton);
 		});
 
 		return htmlElement;

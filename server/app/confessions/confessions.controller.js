@@ -132,3 +132,38 @@ export const likeConfession = asyncHandler(async (req, res) => {
 
 	res.status(200).json(updatedConfession);
 });
+
+/**
+ * @description Unlike a confession.
+ * @function likeConfession
+ * @param {IncomingMessage} req - The incoming HTTP request.
+ * @param {ServerResponse} res - The outgoing HTTP response.
+ * @throws {Error} - If the confession is not found.
+ * @returns {Promise<Confession>} - A promise that resolves or rejects with an error.
+ */
+
+export const unlikeConfession = asyncHandler(async (req, res) => {
+	const confession = await prisma.confession.findUnique({
+		where: { id: req.params.id },
+	});
+
+	if (!confession) {
+		res.status(404);
+		throw new Error("Confession not found");
+	}
+
+	const updatedConfession = await prisma.confession.update({
+		where: { id: confession.id },
+		data: {
+			likes: {
+				decrement: 1,
+			},
+		},
+		select: {
+			id: true,
+			likes: true,
+		},
+	});
+
+	res.status(200).json(updatedConfession);
+});

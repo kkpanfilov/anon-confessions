@@ -85,4 +85,23 @@ export class ConfessionsService {
 
 		return data;
 	}
+
+	async unlikeConfession(id) {
+		const result = await FetchQuery({
+			path: `${this.#BASE_URL}/${id}/unlike`,
+			method: "PATCH",
+		});
+
+		const data = result.data;
+
+		if (!data) {
+			this.notificationService.show({
+				type: "error",
+				title: "Error",
+				message: "Failed to unlike confession",
+			});
+		}
+
+		return data;
+	}
 }
