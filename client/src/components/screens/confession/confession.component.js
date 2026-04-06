@@ -24,6 +24,18 @@ export class Confession extends BaseScreen {
 	}
 
 	#renderConfession(htmlElement) {
+		const createdConfessions = JSON.parse(
+			this.storageService.getItem("createdConfessions"),
+		);
+
+		if (createdConfessions[this.confessionId]) {
+			const editButton = $(htmlElement).find('button[data-id="edit-button"]');
+			const deleteButton = $(htmlElement).find('button[data-id="delete-button"]');
+
+			editButton.removeClass('hide');
+			deleteButton.removeClass('hide');
+		}
+
 		this.confessionsService
 			.getConfessionById(this.confessionId)
 			.then(confession => {

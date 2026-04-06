@@ -151,7 +151,7 @@
 					background: rgba(161, 36, 36, 0.325);
 
 					&:hover {
-						background:rgba(205, 63, 63, 0.325);
+						background: rgba(205, 63, 63, 0.325);
 					}
 				}
 
@@ -200,6 +200,26 @@
 								width: 100%;
 							}
 						}
+					}
+
+					&-button[data-id="share-button"] {
+						margin-left: 30px;
+					}
+
+					&-button[data-id="edit-button"] {
+						background: #464951
+					}
+
+					&-button[data-id="edit-button"]:hover {
+						background: #646872
+					}
+
+					&-button[data-id="delete-button"] {
+						background: #d93d3d;
+					}
+
+					&-button[data-id="delete-button"]:hover {
+						background: #ff6b6b;
 					}
 				}
 			}

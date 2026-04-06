@@ -3,6 +3,7 @@ import { BaseScreen } from "@/core/component/base-screen.component.js";
 import formService from "@/core/services/form.service.js";
 import renderService from "@/core/services/render.service.js";
 import notificationsService from "@/core/services/notifications.service.js";
+import storageService from "@/core/services/storage.service.js";
 import { ConfessionsService } from "@/api/confessions.service.js";
 
 import { $ } from "@/core/jquery/jquery.lib.js";
@@ -17,6 +18,7 @@ export class Add extends BaseScreen {
 		});
 
 		this.confessionsService = new ConfessionsService();
+		this.storageService = storageService;
 	}
 
 	#handleSubmit = event => {
@@ -31,12 +33,26 @@ export class Add extends BaseScreen {
 			return;
 		}
 
+		if (!data.title) {
+			data.title = "Anonymous confession";
+		}
+
 		this.confessionsService.createConfession(data).then(result => {
 			notificationsService.show({
 				type: "success",
 				title: "Success",
 				message: "Confession created successfully",
 			});
+
+			const createdConfessions =
+				this.storageService.getItem("createdConfessions") || {};
+
+			createdConfessions[result.id] = result.tokenHash;
+
+			this.storageService.setItem(
+				"createdConfessions",
+				JSON.stringify(createdConfessions),
+			);
 
 			setTimeout(() => {
 				window.location.href = `/confession/${result.id}`;

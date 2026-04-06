@@ -116,6 +116,38 @@ export class JQuery {
 	}
 
 	/**
+	 * Adds a class to the current element.
+	 * @param {string} className - the class to add
+	 * @throws {Error} if the class name is not a string
+	 * @returns {JQuery} a new instance of JQuery class pointing to the modified element
+	 */
+
+	addClass(className) {
+		if (typeof className !== "string") {
+			throw new Error("Invalid class name");
+		}
+
+		this.element.classList.add(className);
+		return this;
+	}
+
+	/**
+	 * Removes a class from the current element.
+	 * @param {string} className - the class to remove
+	 * @throws {Error} if the class name is not a string
+	 * @returns {JQuery} a new instance of JQuery class pointing to the modified element
+	 */
+
+	removeClass(className) {
+		if (typeof className !== "string") {
+			throw new Error("Invalid class name");
+		}
+
+		this.element.classList.remove(className);
+		return this;
+	}
+
+	/**
 	 * Sets the text content of the current element.
 	 * @param {string} text - the text to set
 	 * @throws {Error} if the text is not a string
