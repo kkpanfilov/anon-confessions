@@ -108,29 +108,59 @@ export const createConfession = asyncHandler(async (req, res) => {
  */
 
 export const likeConfession = asyncHandler(async (req, res) => {
-	const confession = await prisma.confession.findUnique({
-		where: { id: req.params.id },
-	});
+	const confessionId = req.params.id;
+	const voterHash = hashToken(`${process.env.VOTER_SECRET}:${req.anonVoterId}`);
 
-	if (!confession) {
-		res.status(404);
-		throw new Error("Confession not found");
-	}
-
-	const updatedConfession = await prisma.confession.update({
-		where: { id: confession.id },
-		data: {
-			likes: {
-				increment: 1,
+	const result = await prisma.$transaction(async tx => {
+		const confession = await tx.confession.findUnique({
+			where: { id: req.params.id },
+			select: {
+				id: true,
+				likes: true,
 			},
-		},
-		select: {
-			id: true,
-			likes: true,
-		},
+		});
+
+		if (!confession) {
+			res.status(404);
+			throw new Error("Confession not found");
+		}
+
+		try {
+			await tx.confessionLike.create({
+				data: {
+					confessionId: confessionId,
+					voterHash: voterHash,
+				},
+			});
+		} catch (err) {
+			if (err.code === "P2002") {
+				return {
+					id: confession.id,
+					likes: confession.likes,
+					message: "Already liked",
+				};
+			}
+
+			throw err;
+		}
+
+		const updated = await tx.confession.update({
+			where: { id: confession.id },
+			data: {
+				likes: {
+					increment: 1,
+				},
+			},
+			select: {
+				id: true,
+				likes: true,
+			},
+		});
+
+		return { ...updated, message: "Successfully liked confession" };
 	});
 
-	res.status(200).json(updatedConfession);
+	res.status(200).json(result);
 });
 
 /**
@@ -143,27 +173,47 @@ export const likeConfession = asyncHandler(async (req, res) => {
  */
 
 export const unlikeConfession = asyncHandler(async (req, res) => {
-	const confession = await prisma.confession.findUnique({
-		where: { id: req.params.id },
-	});
+	const confessionId = req.params.id;
+	const voterHash = hashToken(`${process.env.VOTER_SECRET}:${req.anonVoterId}`);
 
-	if (!confession) {
-		res.status(404);
-		throw new Error("Confession not found");
-	}
-
-	const updatedConfession = await prisma.confession.update({
-		where: { id: confession.id },
-		data: {
-			likes: {
-				decrement: 1,
+	const result = await prisma.$transaction(async tx => {
+		const confession = await tx.confession.findUnique({
+			where: { id: req.params.id },
+			select: {
+				id: true,
+				likes: true,
 			},
-		},
-		select: {
-			id: true,
-			likes: true,
-		},
+		});
+
+		if (!confession) {
+			res.status(404);
+			throw new Error("Confession not found");
+		}
+
+		await tx.confessionLike.delete({
+			where: {
+				confessionId_voterHash: {
+					confessionId: confessionId,
+					voterHash: voterHash,
+				}
+			},
+		});
+
+		const updated = await tx.confession.update({
+			where: { id: confession.id },
+			data: {
+				likes: {
+					decrement: 1,
+				},
+			},
+			select: {
+				id: true,
+				likes: true,
+			},
+		});
+
+		return { ...updated, message: "Successfully unliked confession" };
 	});
 
-	res.status(200).json(updatedConfession);
+	res.status(200).json(result);
 });
