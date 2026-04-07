@@ -42,4 +42,13 @@
 		justify-content: center;
 		gap: 25px;
 	}
+
+	&-empty {
+		padding: 28px 20px;
+		border: 1px dashed #2c2f3f;
+		border-radius: 12px;
+		color: #a0a3b1;
+		font-size: 15px;
+		text-align: center;
+	}
 }

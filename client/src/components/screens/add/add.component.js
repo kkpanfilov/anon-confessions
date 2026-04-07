@@ -45,7 +45,7 @@ export class Add extends BaseScreen {
 			});
 
 			const createdConfessions =
-				this.storageService.getItem("createdConfessions") || {};
+				JSON.parse(this.storageService.getItem("createdConfessions")) || {};
 
 			createdConfessions[result.id] = result.tokenHash;
 

@@ -6,6 +6,7 @@ import {
 	getLatestConfessions,
 	likeConfession,
 	unlikeConfession,
+	deleteConfession,
 } from "./confessions.controller.js";
 
 import { ensureAnonVoter } from "../middleware/anon-voter.middleware.js";
@@ -17,5 +18,6 @@ router.route("/create").post(createConfession);
 router.route("/:id").get(getConfessionById);
 router.route("/:id/like").patch(ensureAnonVoter, likeConfession);
 router.route("/:id/unlike").patch(ensureAnonVoter, unlikeConfession);
+router.route("/:id/delete").delete(deleteConfession);
 
 export default router;

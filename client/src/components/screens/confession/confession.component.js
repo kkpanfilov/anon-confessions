@@ -30,10 +30,12 @@ export class Confession extends BaseScreen {
 
 		if (createdConfessions[this.confessionId]) {
 			const editButton = $(htmlElement).find('button[data-id="edit-button"]');
-			const deleteButton = $(htmlElement).find('button[data-id="delete-button"]');
+			const deleteButton = $(htmlElement).find(
+				'button[data-id="delete-button"]',
+			);
 
-			editButton.removeClass('hide');
-			deleteButton.removeClass('hide');
+			editButton.removeClass("hide");
+			deleteButton.removeClass("hide");
 		}
 
 		this.confessionsService
@@ -122,6 +124,36 @@ export class Confession extends BaseScreen {
 		else this.#likeConfession(htmlElement, likedConfessions, likeButton);
 	};
 
+	#handleDeleteButton = () => {
+		const createdConfessions = JSON.parse(
+			this.storageService.getItem("createdConfessions"),
+		);
+		const tokenHash = createdConfessions[this.confessionId];
+
+		if (!tokenHash) {
+			this.notificationsService.show({
+				type: "error",
+				title: "Error",
+				message: "No permission to delete confession",
+			});
+			return;
+		}
+
+		this.confessionsService
+			.deleteConfession(this.confessionId, tokenHash)
+			.then(() => {
+				this.notificationsService.show({
+					type: "success",
+					title: "Success",
+					message: "Confession deleted successfully",
+				});
+
+				setTimeout(() => {
+					window.location.href = "/feed";
+				}, 1000);
+			});
+	};
+
 	render() {
 		const htmlElement = renderService.htmlToElement(template, [], styles);
 
@@ -129,6 +161,7 @@ export class Confession extends BaseScreen {
 
 		const shareButton = $(htmlElement).find("button[data-id='share-button']");
 		const likeButton = $(htmlElement).find("button[data-id='like-button']");
+		const deleteButton = $(htmlElement).find('button[data-id="delete-button"]');
 
 		const likedConfessions =
 			JSON.parse(this.storageService.getItem("likedConfessions")) || [];
@@ -141,6 +174,7 @@ export class Confession extends BaseScreen {
 		likeButton.on("click", () => {
 			this.#handleLikeButton(htmlElement, likeButton);
 		});
+		deleteButton.on("click", this.#handleDeleteButton);
 
 		return htmlElement;
 	}

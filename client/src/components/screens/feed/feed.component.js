@@ -22,12 +22,18 @@ export class Feed extends BaseScreen {
 		const htmlElement = renderService.htmlToElement(template, {}, styles);
 
 		const feedList = $(htmlElement).find("div[data-id='feed-list']");
+		const emptyState = $(htmlElement).find("div[data-id='feed-empty']").element;
 
 		feedList.clear();
 
 		this.confessionsService
 			.getLatestConfessions()
 			.then((list) => {
+				if (!list.length) {
+					feedList.append(emptyState);
+					return;
+				}
+
 				list.forEach(confession => {
 					const confessionClone = new ConfessionItem(confession).render();
 					feedList.append(confessionClone);

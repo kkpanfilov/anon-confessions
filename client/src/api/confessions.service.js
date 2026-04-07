@@ -56,11 +56,33 @@ export class ConfessionsService {
 
 		const data = result.data;
 
+		console.log(data)
+
 		if (!data) {
 			this.notificationService.show({
 				type: "error",
 				title: "Error",
 				message: "Failed to create confession",
+			});
+		}
+
+		return data;
+	}
+
+	async deleteConfession(id, tokenHash) {
+		const result = await FetchQuery({
+			path: `${this.#BASE_URL}/${id}/delete`,
+			method: "DELETE",
+			body: { tokenHash },
+		});
+
+		const data = result.data;
+
+		if (!data) {
+			this.notificationService.show({
+				type: "error",
+				title: "Error",
+				message: "Failed to delete confession",
 			});
 		}
 

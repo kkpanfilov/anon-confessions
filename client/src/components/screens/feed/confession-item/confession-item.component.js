@@ -3,10 +3,10 @@ import { $ } from "@/core/jquery/jquery.lib.js";
 import ChildComponent from "@/core/component/child.component.js";
 import renderService from "@/core/services/render.service.js";
 
-import styles from "./confession-item.module.scss";
-import template from "./confession-item.template.html";
 import { timeAgo } from "@/utils/timeAgo.js";
 
+import styles from "./confession-item.module.scss";
+import template from "./confession-item.template.html";
 export default class ConfessionItem extends ChildComponent {
 	constructor(confession) {
 		super();
@@ -26,7 +26,7 @@ export default class ConfessionItem extends ChildComponent {
 		$(this.element).attr("href", `/confession/${this.id}`);
 		$(this.element)
 			.find('div[data-id="confession-title"]')
-			.text(this.content);
+			.text(this.title);
 		$(this.element)
 			.find('div[data-id="confession-content"]')
 			.text(this.content);
