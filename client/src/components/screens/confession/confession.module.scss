@@ -207,11 +207,15 @@
 					}
 
 					&-button[data-id="edit-button"] {
-						background: #464951
+						background: #464951;
 					}
 
 					&-button[data-id="edit-button"]:hover {
-						background: #646872
+						background: #646872;
+					}
+
+					&-button[data-id="save-button"] {
+						width: 150px;
 					}
 
 					&-button[data-id="delete-button"] {
@@ -223,6 +227,55 @@
 					}
 				}
 			}
+		}
+	}
+
+	input {
+		width: 100%;
+		background: #101318;
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		border-radius: variables.$radius;
+		padding: 12px 14px;
+		color: #eef1f7;
+		font-size: 14px;
+		outline: none;
+		transition:
+			border-color 0.2s ease,
+			box-shadow 0.2s ease;
+
+		&:focus {
+			border-color: rgba(99, 149, 199, 0.7);
+			box-shadow: 0 0 0 3px rgba(99, 149, 199, 0.18);
+		}
+
+		&::placeholder {
+			color: #6f7583;
+		}
+	}
+
+	textarea {
+		width: 100%;
+		min-height: 160px;
+		resize: vertical;
+		background: #101318;
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		border-radius: variables.$radius;
+		padding: 12px 14px;
+		color: #eef1f7;
+		font-size: 14px;
+		line-height: 1.6;
+		outline: none;
+		transition:
+			border-color 0.2s ease,
+			box-shadow 0.2s ease;
+
+		&:focus {
+			border-color: rgba(99, 149, 199, 0.7);
+			box-shadow: 0 0 0 3px rgba(99, 149, 199, 0.18);
+		}
+
+		&::placeholder {
+			color: #6f7583;
 		}
 	}
 }

@@ -9,9 +9,9 @@ export class ConfessionsService {
 		this.notificationService = NotificationsService;
 	}
 
-	async getLatestConfessions() {
+	async getRandomConfessions() {
 		const result = await FetchQuery({
-			path: `${this.#BASE_URL}/latest`,
+			path: `${this.#BASE_URL}/random`,
 			method: "GET",
 		});
 
@@ -21,7 +21,7 @@ export class ConfessionsService {
 			this.notificationService.show({
 				type: "error",
 				title: "Error",
-				message: "Failed to get latest confessions",
+				message: "Failed to get random confessions",
 			});
 		}
 
@@ -56,13 +56,34 @@ export class ConfessionsService {
 
 		const data = result.data;
 
-		console.log(data)
-
 		if (!data) {
 			this.notificationService.show({
 				type: "error",
 				title: "Error",
 				message: "Failed to create confession",
+			});
+		}
+
+		return data;
+	}
+
+	async updateConfession(id, body, tokenHash) {
+		const result = await FetchQuery({
+			path: `${this.#BASE_URL}/${id}/edit`,
+			method: "PATCH",
+			body: {
+				...body,
+				tokenHash,
+			},
+		});
+
+		const data = result.data;
+
+		if (!data) {
+			this.notificationService.show({
+				type: "error",
+				title: "Error",
+				message: "Failed to edit confession",
 			});
 		}
 

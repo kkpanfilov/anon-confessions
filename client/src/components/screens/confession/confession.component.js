@@ -9,7 +9,8 @@ import { $ } from "@/core/jquery/jquery.lib.js";
 import styles from "./confession.module.scss";
 import template from "./confession.template.html";
 
-import { timeAgo } from "@/utils/timeAgo.js";
+import { timeAgo } from "@/utils/timeAgo.util.js";
+import formService from "@/core/services/form.service.js";
 
 export class Confession extends BaseScreen {
 	constructor() {
@@ -17,8 +18,10 @@ export class Confession extends BaseScreen {
 			title: "Confession",
 		});
 
+		this.htmlElement;
 		this.notificationsService = notificationsService;
 		this.storageService = storageService;
+		this.formService = formService;
 		this.confessionsService = new ConfessionsService();
 		this.confessionId = window.location.pathname.split("/").pop();
 	}
@@ -154,6 +157,71 @@ export class Confession extends BaseScreen {
 			});
 	};
 
+	#showEditForm = htmlElement => {
+		const confessionItem = $(htmlElement);
+		const confessionContent = $(htmlElement).find(
+			'div[data-id="confession-content"]',
+		);
+		const confessionTitle = $(htmlElement).find(
+			'h1[data-id="confession-title"]',
+		);
+
+		const confessionTitleValue = confessionTitle.element.innerText;
+
+		confessionContent.changeTag("textarea").attr("name", "content");
+		confessionTitle.changeTag("input").attr("name", "title");
+
+		confessionTitle.element.value = confessionTitleValue;
+
+		const editButton = $(htmlElement).find('button[data-id="edit-button"]');
+		const deleteButton = $(htmlElement).find('button[data-id="delete-button"]');
+		const saveButton = $(htmlElement).find('button[data-id="save-button"]');
+
+		editButton.addClass("hide");
+		deleteButton.addClass("hide");
+		saveButton.removeClass("hide");
+
+		confessionItem.changeTag("form");
+		this.htmlElement = confessionItem.element;
+	};
+
+	#handleEditButton = () => {
+		this.#showEditForm(this.htmlElement);
+	};
+
+	#handleSaveButton = () => {
+		const data = this.formService.getFormData(this.htmlElement);
+
+		const createdConfessions = JSON.parse(
+			this.storageService.getItem("createdConfessions"),
+		);
+		const tokenHash = createdConfessions[this.confessionId];
+
+		if (!tokenHash) {
+			this.notificationsService.show({
+				type: "error",
+				title: "Error",
+				message: "No permission to delete confession",
+			});
+			return;
+		}
+
+		this.confessionsService
+			.updateConfession(this.confessionId, data, tokenHash)
+			.then(result => {
+				if (result.message?.toLowerCase() === "confession updated") {
+					this.notificationsService.show({
+						type: "success",
+						title: "Success",
+						message: "Confession updated successfully",
+					});
+
+					const newElement = this.render();
+					$("main").replaceChildren(newElement);
+				}
+			});
+	};
+
 	render() {
 		const htmlElement = renderService.htmlToElement(template, [], styles);
 
@@ -161,6 +229,8 @@ export class Confession extends BaseScreen {
 
 		const shareButton = $(htmlElement).find("button[data-id='share-button']");
 		const likeButton = $(htmlElement).find("button[data-id='like-button']");
+		const editButton = $(htmlElement).find('button[data-id="edit-button"]');
+		const saveButton = $(htmlElement).find('button[data-id="save-button"]');
 		const deleteButton = $(htmlElement).find('button[data-id="delete-button"]');
 
 		const likedConfessions =
@@ -174,7 +244,15 @@ export class Confession extends BaseScreen {
 		likeButton.on("click", () => {
 			this.#handleLikeButton(htmlElement, likeButton);
 		});
+		editButton.on("click", () => {
+			this.#handleEditButton(htmlElement);
+		});
+		saveButton.on("click", () => {
+			this.#handleSaveButton(htmlElement);
+		});
 		deleteButton.on("click", this.#handleDeleteButton);
+
+		this.htmlElement = htmlElement;
 
 		return htmlElement;
 	}

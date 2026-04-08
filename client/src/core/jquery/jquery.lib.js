@@ -148,6 +148,40 @@ export class JQuery {
 	}
 
 	/**
+	 * Changes the tag of the current element.
+	 * @param {string} newTag - the new tag name
+	 * @throws {Error} if the tag name is not a string
+	 * @returns {Element} the modified element
+	 */
+
+	changeTag(newTag) {
+		if (typeof newTag !== "string") {
+			throw new Error("Invalid tag name");
+		}
+
+		const element = this.element;
+
+		const newEl = document.createElement(newTag);
+
+		// Copy attributes
+		for (const attr of element.attributes) {
+			newEl.setAttribute(attr.name, attr.value);
+		}
+
+		// Copy children
+		while (element.firstChild) {
+			newEl.appendChild(element.firstChild);
+		}
+
+		// Replace the element
+		element.replaceWith(newEl);
+
+		this.element = newEl;
+
+		return this;
+	}
+
+	/**
 	 * Sets the text content of the current element.
 	 * @param {string} text - the text to set
 	 * @throws {Error} if the text is not a string

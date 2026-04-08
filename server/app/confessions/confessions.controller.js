@@ -35,27 +35,17 @@ export const getConfessionById = asyncHandler(async (req, res) => {
 });
 
 /**
- * @description Get latest confessions.
- * @function getLatestConfessions
+ * @description Get random confessions.
+ * @function getRandomConfessions
  * @param {IncomingMessage} req - The incoming HTTP request.
  * @param {ServerResponse} res - The outgoing HTTP response.
  * @returns {Promise<void>} - A promise that resolves or rejects with an error.
  */
 
-export const getLatestConfessions = asyncHandler(async (req, res) => {
-	const confessions = await prisma.confession.findMany({
-		take: 10,
-		orderBy: {
-			createdAt: "desc",
-		},
-		select: {
-			id: true,
-			createdAt: true,
-			title: true,
-			content: true,
-			likes: true,
-		},
-	});
+export const getRandomConfessions = asyncHandler(async (req, res) => {
+	const confessions = await prisma.$queryRawUnsafe(
+		`SELECT * FROM "Confession" ORDER BY RANDOM() LIMIT 15;`,
+	);
 
 	res.status(200).json(confessions);
 });
@@ -96,6 +86,56 @@ export const createConfession = asyncHandler(async (req, res) => {
 	});
 
 	res.status(201).json(confession);
+});
+
+/**
+ * @description Update a confession by its id.
+ * @function updateConfession
+ * @param {IncomingMessage} req - The incoming HTTP request.
+ * @param {ServerResponse} res - The outgoing HTTP response.
+ * @throws {Error} - If the confession is not found, or if the token hash does not match.
+ * @returns {Promise<{id: string, title: string, content: string, message: string}>} - A promise that resolves or rejects with an error.
+ */
+
+export const updateConfession = asyncHandler(async (req, res) => {
+	const confessionId = req.params.id;
+	const tokenHash = req.body.tokenHash;
+	const body = { ...req.body };
+
+	if (!tokenHash) {
+		res.status(400);
+		throw new Error("Confession token hash required");
+	}
+
+	const confession = await prisma.confession.findUnique({
+		where: { id: confessionId },
+		select: {
+			id: true,
+			tokenHash: true,
+		},
+	});
+
+	if (!confession) {
+		res.status(404);
+		throw new Error("Confession not found");
+	}
+
+	if (confession.tokenHash !== tokenHash) {
+		res.status(401);
+		throw new Error("Confession token hash does not match");
+	}
+
+	const updated = await prisma.confession.update({
+		where: { id: confession.id },
+		data: body,
+		select: {
+			id: true,
+			title: true,
+			content: true,
+		},
+	});
+
+	res.status(200).json({ ...updated, message: "Confession updated" });
 });
 
 /**

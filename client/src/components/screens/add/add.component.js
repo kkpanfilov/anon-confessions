@@ -19,10 +19,11 @@ export class Add extends BaseScreen {
 
 		this.confessionsService = new ConfessionsService();
 		this.storageService = storageService;
+		this.formService = formService;
 	}
 
 	#handleSubmit = event => {
-		const data = formService.getFormData(event.target);
+		const data = this.formService.getFormData(event.target);
 
 		if (!data.content) {
 			notificationsService.show({

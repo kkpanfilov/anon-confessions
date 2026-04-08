@@ -27,7 +27,7 @@ export class Feed extends BaseScreen {
 		feedList.clear();
 
 		this.confessionsService
-			.getLatestConfessions()
+			.getRandomConfessions()
 			.then((list) => {
 				if (!list.length) {
 					feedList.append(emptyState);
