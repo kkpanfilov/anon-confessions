@@ -1,3 +1,5 @@
+import { env } from "../validations/env.validation.js";
+
 /**
  * Returns a 404 Not Found error for the given request.
  * @param {Object} req - The Express request object.
@@ -20,10 +22,11 @@ export const notFound = (req, res, next) => {
  */
 
 export const errorHandler = (err, req, res, next) => {
+	if (env.NODE_ENV === "development") console.error(err);
 	const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
 	res.status(statusCode);
 	res.json({
 		message: err.message,
-		stack: process.env.NODE_ENV === "production" ? null : err.stack,
+		stack: env.NODE_ENV === "production" ? null : err.stack,
 	});
 };

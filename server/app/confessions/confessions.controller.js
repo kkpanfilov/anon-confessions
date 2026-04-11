@@ -1,5 +1,9 @@
 import asyncHandler from "express-async-handler";
 
+import { env } from "../validations/env.validation.js";
+
+import { confessionSchema } from "../validations/confessions.validation.js";
+
 import { prisma } from "../prisma.js";
 
 import { generateToken } from "../utils/crypto/generateToken.js";
@@ -15,8 +19,10 @@ import { hashToken } from "../utils/crypto/hashToken.js";
  */
 
 export const getConfessionById = asyncHandler(async (req, res) => {
+	const confessionId = confessionSchema.params.parse(req.params).id;
+
 	const confession = await prisma.confession.findUnique({
-		where: { id: req.params.id },
+		where: { id: confessionId },
 		select: {
 			id: true,
 			createdAt: true,
@@ -43,10 +49,38 @@ export const getConfessionById = asyncHandler(async (req, res) => {
  */
 
 export const getRandomConfessions = asyncHandler(async (req, res) => {
-	// TODO: Здесь сразу три проблемы: $queryRawUnsafe не нужен для статичного SQL, ORDER BY RANDOM() плохо масштабируется, а SELECT * публично светит tokenHash. В текущем виде любой клиент может вытащить секрет владения из фида.
-	const confessions = await prisma.$queryRawUnsafe(
-		`SELECT * FROM "Confession" ORDER BY RANDOM() LIMIT 15;`,
-	);
+	const pivot = Math.random();
+	let confessions;
+
+	const first = await prisma.confession.findMany({
+		where: { randomKey: { gte: pivot } },
+		orderBy: { randomKey: "asc" },
+		take: 15,
+		select: {
+			id: true,
+			title: true,
+			createdAt: true,
+			content: true,
+			likes: true,
+		},
+	});
+
+	if (first.length < 15) {
+		const second = await prisma.confession.findMany({
+			where: { randomKey: { lt: pivot } },
+			orderBy: { randomKey: "asc" },
+			take: 15 - first.length,
+			select: {
+				id: true,
+				title: true,
+				createdAt: true,
+				content: true,
+				likes: true,
+			},
+		});
+
+		confessions = [...first, ...second];
+	}
 
 	res.status(200).json(confessions);
 });
@@ -61,15 +95,14 @@ export const getRandomConfessions = asyncHandler(async (req, res) => {
  */
 
 export const createConfession = asyncHandler(async (req, res) => {
-	const body = { ...req.body };
+	const { title, content } = confessionSchema.body.parse(req.body);
 
-	// TODO: Серверная валидация почти отсутствует: нет trim/type/maxLength whitelist-а. Сейчас UI-лимиты легко обходятся прямым запросом, а лишние поля из req.body уходят дальше по слою данных.
-	if (!body.content) {
+	if (!content) {
 		res.status(400);
 		throw new Error("Confession content required");
 	}
 
-	if (!body.title) {
+	if (!title) {
 		res.status(400);
 		throw new Error("Confession title required");
 	}
@@ -77,14 +110,10 @@ export const createConfession = asyncHandler(async (req, res) => {
 	const token = generateToken();
 	const tokenHash = hashToken(token);
 
-	body.tokenHash = tokenHash;
-
 	const confession = await prisma.confession.create({
-		// TODO: Не передавай body в Prisma как есть. Это mass assignment: клиент может подсовывать likes/createdAt/updatedAt и другие поля, которые UI не должен контролировать.
-		data: body,
+		data: { title, content, tokenHash },
 		select: {
 			id: true,
-			// TODO: Сейчас клиент получает уже готовый tokenHash и потом использует его как bearer-secret. Тогда хеш перестаёт быть защитой: при утечке БД или ответа можно редактировать и удалять запись без знания исходного token.
 			tokenHash: true,
 		},
 	});
@@ -102,11 +131,11 @@ export const createConfession = asyncHandler(async (req, res) => {
  */
 
 export const updateConfession = asyncHandler(async (req, res) => {
-	const confessionId = req.params.id;
+	const confessionId = confessionSchema.params.parse(req.params).id;
 	const tokenHash = req.body.tokenHash;
-	const body = { ...req.body };
 
-	// TODO: Нужно отдельно валидировать req.params.id как UUID и не отдавать управление формату API через исключения Prisma. Иначе часть ошибок будет 500 вместо предсказуемых 400/404.
+	const { title, content } = confessionSchema.body.parse(req.body);
+
 	if (!tokenHash) {
 		res.status(400);
 		throw new Error("Confession token hash required");
@@ -130,10 +159,9 @@ export const updateConfession = asyncHandler(async (req, res) => {
 		throw new Error("Confession token hash does not match");
 	}
 
-	// TODO: body содержит и tokenHash, и любые остальные поля пользователя, а дальше целиком идёт в update. Это прямой mass assignment и возможность менять технические поля модели.
 	const updated = await prisma.confession.update({
-		where: { id: confession.id },
-		data: body,
+		where: { id: confessionId },
+		data: { title, content },
 		select: {
 			id: true,
 			title: true,
@@ -154,7 +182,7 @@ export const updateConfession = asyncHandler(async (req, res) => {
  */
 
 export const deleteConfession = asyncHandler(async (req, res) => {
-	const confessionId = req.params.id;
+	const confessionId = confessionSchema.params.parse(req.params).id;
 	const tokenHash = req.body.tokenHash;
 
 	if (!tokenHash) {
@@ -185,13 +213,6 @@ export const deleteConfession = asyncHandler(async (req, res) => {
 			where: { id: confessionId },
 		});
 
-		// TODO: Здесь дублируется ответственность schema.prisma: для ConfessionLike уже стоит onDelete: Cascade. Лишняя ручная очистка создаёт расхождение между кодом и схемой.
-		await tx.confessionLike.deleteMany({
-			where: {
-				confessionId: confessionId,
-			},
-		});
-
 		return {
 			id: confessionId,
 			isDeleted: true,
@@ -211,12 +232,12 @@ export const deleteConfession = asyncHandler(async (req, res) => {
  */
 
 export const likeConfession = asyncHandler(async (req, res) => {
-	const confessionId = req.params.id;
-	const voterHash = hashToken(`${process.env.VOTER_SECRET}:${req.anonVoterId}`);
+	const confessionId = confessionSchema.params.parse(req.params).id;
+	const voterHash = hashToken(`${env.VOTER_SECRET}:${req.anonVoterId}`);
 
 	const result = await prisma.$transaction(async tx => {
 		const confession = await tx.confession.findUnique({
-			where: { id: req.params.id },
+			where: { id: confessionId },
 			select: {
 				id: true,
 				likes: true,
@@ -276,8 +297,8 @@ export const likeConfession = asyncHandler(async (req, res) => {
  */
 
 export const unlikeConfession = asyncHandler(async (req, res) => {
-	const confessionId = req.params.id;
-	const voterHash = hashToken(`${process.env.VOTER_SECRET}:${req.anonVoterId}`);
+	const confessionId = confessionSchema.params.parse(req.params).id;
+	const voterHash = hashToken(`${env.VOTER_SECRET}:${req.anonVoterId}`);
 
 	const result = await prisma.$transaction(async tx => {
 		const confession = await tx.confession.findUnique({

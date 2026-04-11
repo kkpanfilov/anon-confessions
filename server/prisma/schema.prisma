@@ -14,22 +14,24 @@ model Confession {
   likes     Int      @default(0)
   // TODO: tokenHash сейчас одновременно и "хеш", и клиентский секрет владения. Это слабая модель: при утечке БД поле уже можно использовать как credential без знания исходного token.
   tokenHash String   @unique
+  randomKey Float    @default(dbgenerated("random()")) @map("random_key")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  likedBy   ConfessionLike[]
+  likedBy ConfessionLike[]
 
+  @@index([randomKey])
   @@index([createdAt(sort: Desc)])
   @@index([likes(sort: Desc)])
 }
 
 model ConfessionLike {
-  id           String     @id @default(uuid()) @db.Uuid
-  confessionId String     @db.Uuid
-  voterHash    String     @db.VarChar(64)
-  createdAt    DateTime   @default(now()) @map("created_at")
+  id           String   @id @default(uuid()) @db.Uuid
+  confessionId String   @db.Uuid
+  voterHash    String   @db.VarChar(64)
+  createdAt    DateTime @default(now()) @map("created_at")
 
-  confession   Confession @relation(fields: [confessionId], references: [id], onDelete: Cascade)
+  confession Confession @relation(fields: [confessionId], references: [id], onDelete: Cascade)
 
   @@unique([confessionId, voterHash])
   @@index([confessionId])

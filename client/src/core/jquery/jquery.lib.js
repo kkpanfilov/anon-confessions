@@ -111,9 +111,9 @@ export class JQuery {
 			}
 
 			this.element.style[property] = styles[property];
-			// TODO: return внутри цикла применяет только первое CSS-свойство. Такой helper создаёт тихие баги, которые потом маскируются под "странное поведение" компонентов.
-			return this;
 		}
+
+		return this;
 	}
 
 	/**

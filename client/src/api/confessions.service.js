@@ -50,7 +50,7 @@ export class ConfessionsService {
 
 	async createConfession(body) {
 		const result = await FetchQuery({
-			path: `${this.#BASE_URL}/create`,
+			path: `${this.#BASE_URL}/`,
 			method: "POST",
 			body,
 		});
@@ -70,7 +70,7 @@ export class ConfessionsService {
 
 	async updateConfession(id, body, tokenHash) {
 		const result = await FetchQuery({
-			path: `${this.#BASE_URL}/${id}/edit`,
+			path: `${this.#BASE_URL}/${id}`,
 			method: "PATCH",
 			body: {
 				...body,
@@ -93,7 +93,7 @@ export class ConfessionsService {
 
 	async deleteConfession(id, tokenHash) {
 		const result = await FetchQuery({
-			path: `${this.#BASE_URL}/${id}/delete`,
+			path: `${this.#BASE_URL}/${id}`,
 			method: "DELETE",
 			body: { tokenHash },
 		});

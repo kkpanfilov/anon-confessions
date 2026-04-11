@@ -3,7 +3,11 @@ import "dotenv/config";
 import express from "express";
 import morgan from "morgan";
 import cors from "cors";
+import helmet from "helmet";
 import cookieParser from "cookie-parser";
+import { rateLimit } from "express-rate-limit";
+
+import { env } from "./app/validations/env.validation.js";
 
 import confessionsRoutes from "./app/confessions/confessions.routes.js";
 
@@ -15,19 +19,29 @@ import { gracefulShutdown } from "./app/utils/gracefulShutdown.js";
 const app = express();
 
 async function main() {
-	if (process.env.NODE_ENV === "development") app.use(morgan("dev"));
+	if (env.NODE_ENV === "development") app.use(morgan("dev"));
 
-	const port = process.env.PORT || 4200;
+	const port = env.PORT;
 
-	// TODO: API полностью публичный, поэтому bootstrap должен жёстко валидировать env и подключать базовые защиты вроде rate limit/body limit/helmet. Иначе проект легко заспамить и сложно безопасно деплоить.
+	app.use(express.json({ limit: "32kb" }));
+	app.use(helmet());
 	app.use(
 		cors({
-			origin: process.env.CLIENT_URL,
+			origin: env.CLIENT_URL,
 			credentials: true,
 		}),
 	);
-	app.use(express.json());
-	app.use(cookieParser(process.env.COOKIE_SECRET));
+	app.use(
+		rateLimit({
+			windowMs: 15 * 60 * 1000, // 15 minutes
+			limit: 100,
+			standardHeaders: "draft-8",
+			legacyHeaders: false,
+			ipv6Subnet: 56,
+		}),
+	);
+	app.use(cookieParser(env.COOKIE_SECRET));
+
 	app.use("/api/confessions", confessionsRoutes);
 
 	app.use(notFound);

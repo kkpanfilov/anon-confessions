@@ -175,6 +175,7 @@ export class Confession extends BaseScreen {
 
 		confessionTitle.element.value = confessionTitleValue;
 
+		// TODO: Необходимо оставлять лишь кнопку Save на панели задач. Убрать Share и Like
 		const editButton = $(htmlElement).find('button[data-id="edit-button"]');
 		const deleteButton = $(htmlElement).find('button[data-id="delete-button"]');
 		const saveButton = $(htmlElement).find('button[data-id="save-button"]');
