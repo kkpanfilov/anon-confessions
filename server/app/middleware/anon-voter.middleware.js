@@ -17,10 +17,12 @@ export function ensureAnonVoter(req, res, next) {
 	if (!anonVoterId) {
 		const token = generateToken();
 
+		// TODO: Новый token ставится только в cookie, но не попадает в req.anonVoterId. Из-за этого первый like/unlike нового пользователя уйдёт с undefined и сломает дедупликацию голосов.
 		res.cookie(COOKIE_NAME, token, {
 			httpOnly: true,
 			signed: true,
 			sameSite: "lax",
+			// TODO: secure: true без проверки HTTPS ломает локальную разработку и http-окружения: браузер не сохранит cookie, а лайки будут вести себя нестабильно.
 			secure: true,
 			maxAge: 1000 * 60 * 60 * 24 * 180,
 			path: "/",

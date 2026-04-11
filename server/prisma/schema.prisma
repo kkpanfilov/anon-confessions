@@ -10,7 +10,9 @@ model Confession {
   id        String   @id @default(uuid()) @db.Uuid
   title     String   @db.VarChar(32)
   content   String   @db.Text
+  // TODO: likes хранится денормализованно относительно ConfessionLike. Пока API не станет строго идемпотентным и атомарным, счётчик рано или поздно разъедется с таблицей лайков.
   likes     Int      @default(0)
+  // TODO: tokenHash сейчас одновременно и "хеш", и клиентский секрет владения. Это слабая модель: при утечке БД поле уже можно использовать как credential без знания исходного token.
   tokenHash String   @unique
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -32,4 +34,3 @@ model ConfessionLike {
   @@unique([confessionId, voterHash])
   @@index([confessionId])
 }
-

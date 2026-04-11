@@ -9,6 +9,7 @@ export class ConfessionsService {
 		this.notificationService = NotificationsService;
 	}
 
+	// TODO: Сервис дублирует одинаковую обработку ошибок почти в каждом методе и возвращает undefined как "неуспех". Лучше централизовать контракт, иначе UI-компоненты регулярно падают на result.id/list.length.
 	async getRandomConfessions() {
 		const result = await FetchQuery({
 			path: `${this.#BASE_URL}/random`,

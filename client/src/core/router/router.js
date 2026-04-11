@@ -44,6 +44,7 @@ export class Router {
 	}
 
 	#handleLinks() {
+		// TODO: Перехват ссылок одноразовый и без delegation. Ссылки, появившиеся после первого render/async load (карточки фида, back link), уходят в full page reload и ломают SPA-навигацию.
 		const allLinks = document.querySelectorAll("a");
 
 		for (const linkElem of allLinks) {

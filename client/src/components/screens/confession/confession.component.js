@@ -31,6 +31,7 @@ export class Confession extends BaseScreen {
 			this.storageService.getItem("createdConfessions"),
 		);
 
+		// TODO: JSON.parse(null) даёт null, и доступ createdConfessions[this.confessionId] валит экран у пользователя, который просто открыл confession, но сам его не создавал.
 		if (createdConfessions[this.confessionId]) {
 			const editButton = $(htmlElement).find('button[data-id="edit-button"]');
 			const deleteButton = $(htmlElement).find(
@@ -78,6 +79,7 @@ export class Confession extends BaseScreen {
 
 	#likeConfession = (htmlElement, likedConfessions, likeButton) => {
 		this.confessionsService.likeConfession(this.confessionId).then(result => {
+			// TODO: Клиент безусловно показывает success и пушит id в localStorage, даже если сервер ответил "Already liked". Источник истины расходится, а unlike потом может закончиться 500.
 			notificationsService.show({
 				type: "success",
 				title: "Success",
@@ -197,6 +199,7 @@ export class Confession extends BaseScreen {
 		);
 		const tokenHash = createdConfessions[this.confessionId];
 
+		// TODO: Сообщение и ветка прав здесь смешаны с delete-сценарием, а data не валидируется повторно после редактирования. В итоге edit path хрупкий и даёт путаную диагностику.
 		if (!tokenHash) {
 			this.notificationsService.show({
 				type: "error",
@@ -225,6 +228,7 @@ export class Confession extends BaseScreen {
 	render() {
 		const htmlElement = renderService.htmlToElement(template, [], styles);
 
+		// TODO: После перевода карточки в form стоит либо вешать submit на форму, либо явно контролировать типы кнопок и валидацию. Сейчас save/edit/delete завязаны на click-обработчики и легко расходятся с семантикой формы.
 		this.#renderConfession(htmlElement);
 
 		const shareButton = $(htmlElement).find("button[data-id='share-button']");

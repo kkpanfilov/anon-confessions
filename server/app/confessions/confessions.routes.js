@@ -14,6 +14,7 @@ import { ensureAnonVoter } from "../middleware/anon-voter.middleware.js";
 
 const router = express.Router();
 
+// TODO: Маршруты в action-стиле (/create, /:id/edit, /:id/delete) быстро мешают масштабировать API, middleware и версионирование. Лучше держать ресурсную схему POST /, PATCH /:id, DELETE /:id.
 router.route("/random").get(getRandomConfessions);
 router.route("/create").post(createConfession);
 router.route("/:id").get(getConfessionById);

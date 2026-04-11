@@ -29,6 +29,7 @@ export class Feed extends BaseScreen {
 		this.confessionsService
 			.getRandomConfessions()
 			.then((list) => {
+				// TODO: Если API вернул undefined после ошибки, тут будет crash на list.length. UI должен уметь переживать неуспешный запрос без второго исключения поверх первого.
 				if (!list.length) {
 					feedList.append(emptyState);
 					return;

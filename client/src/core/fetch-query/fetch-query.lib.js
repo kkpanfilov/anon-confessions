@@ -30,6 +30,7 @@ export async function FetchQuery({
 	let error = null;
 	let data = null;
 
+	// TODO: Контракт функции размыт: error почти не используется, caller вынужден гадать успех по data, а линтер уже ловит мёртвые состояния. Выбери одно: либо бросать исключения, либо возвращать нормальный result-object с заполненным error.
 	const url = `${SERVER_URL}/api${path}`;
 
 	const requestOptions = {

@@ -23,6 +23,7 @@ export class Add extends BaseScreen {
 	}
 
 	#handleSubmit = event => {
+		// TODO: Здесь нет trim/нормализации, нет блокировки повторного submit и нет safe-ветки на случай, если API вернул undefined после ошибки. Сейчас один неуспешный запрос легко превращается в падение на result.id/result.tokenHash.
 		const data = this.formService.getFormData(event.target);
 
 		if (!data.content) {
@@ -45,6 +46,7 @@ export class Add extends BaseScreen {
 				message: "Confession created successfully",
 			});
 
+			// TODO: Секрет владения хранится в localStorage. Для проекта без auth это допустимо только пока в приложении жёстко исключён XSS; иначе любой инъецированный скрипт мгновенно заберёт право редактировать и удалять записи.
 			const createdConfessions =
 				JSON.parse(this.storageService.getItem("createdConfessions")) || {};
 

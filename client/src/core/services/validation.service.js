@@ -1,4 +1,5 @@
 class ValidationService {
+	// TODO: Валидация сейчас размазана по компонентам и серверу, а этот сервис почти не участвует в потоке. Пока правила не будут собраны в одном месте, front и back будут расходиться по ограничениям и ошибкам.
 	/**
 	 * Validate if a given string is non-empty.
 	 * @param {string} str the string to validate.

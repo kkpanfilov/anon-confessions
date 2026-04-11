@@ -48,6 +48,7 @@ class Notifications {
 		notificationBlock.attr("data-state", "active");
 		if (type) notificationBlock.attr("data-notification-type", type);
 
+		// TODO: Здесь уведомление живёт 10 секунд из-за вложенного setTimeout, а кнопка close из шаблона вообще не подключена. UX и доступность уже расходятся с разметкой.
 		this.#setTimeout(() => {
 			setTimeout(() => {
 				notificationBlock.attr("data-state", "inactive");

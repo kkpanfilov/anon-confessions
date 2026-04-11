@@ -13,6 +13,7 @@ const isDev = mode === "development";
 
 const plugins = [
 	new DefinePlugin({
+		// TODO: Нельзя пробрасывать в клиент весь process.env. Сборка уже кладёт в bundle системные переменные, пути и любые секреты процесса; оставляй только явный whitelist вроде SERVER_URL.
 		"process.env": JSON.stringify(process.env),
 	}),
 	new CleanWebpackPlugin(),

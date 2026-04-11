@@ -12,6 +12,7 @@ export default class ConfessionItem extends ChildComponent {
 	constructor(confession) {
 		super();
 
+		// TODO: DTO фида отличается от DTO детальной страницы (created_at vs createdAt) из-за raw SQL на сервере. Клиент не должен знать внутренние имена колонок БД.
 		this.id = confession.id;
 		this.createdAt = Math.round(
 			new Date(confession.created_at).getTime() / 1000,
@@ -22,6 +23,7 @@ export default class ConfessionItem extends ChildComponent {
 	}
 
 	render() {
+		// TODO: В шаблоне карточки button вложен в <a>, а ниже ещё остался console.log(this). Это и невалидная разметка, и debug-шум в production-коде.
 		this.element = renderService.htmlToElement(template, [], styles);
 
 		console.log(this)

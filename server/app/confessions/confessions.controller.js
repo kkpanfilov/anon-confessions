@@ -43,6 +43,7 @@ export const getConfessionById = asyncHandler(async (req, res) => {
  */
 
 export const getRandomConfessions = asyncHandler(async (req, res) => {
+	// TODO: Здесь сразу три проблемы: $queryRawUnsafe не нужен для статичного SQL, ORDER BY RANDOM() плохо масштабируется, а SELECT * публично светит tokenHash. В текущем виде любой клиент может вытащить секрет владения из фида.
 	const confessions = await prisma.$queryRawUnsafe(
 		`SELECT * FROM "Confession" ORDER BY RANDOM() LIMIT 15;`,
 	);
@@ -62,6 +63,7 @@ export const getRandomConfessions = asyncHandler(async (req, res) => {
 export const createConfession = asyncHandler(async (req, res) => {
 	const body = { ...req.body };
 
+	// TODO: Серверная валидация почти отсутствует: нет trim/type/maxLength whitelist-а. Сейчас UI-лимиты легко обходятся прямым запросом, а лишние поля из req.body уходят дальше по слою данных.
 	if (!body.content) {
 		res.status(400);
 		throw new Error("Confession content required");
@@ -78,9 +80,11 @@ export const createConfession = asyncHandler(async (req, res) => {
 	body.tokenHash = tokenHash;
 
 	const confession = await prisma.confession.create({
+		// TODO: Не передавай body в Prisma как есть. Это mass assignment: клиент может подсовывать likes/createdAt/updatedAt и другие поля, которые UI не должен контролировать.
 		data: body,
 		select: {
 			id: true,
+			// TODO: Сейчас клиент получает уже готовый tokenHash и потом использует его как bearer-secret. Тогда хеш перестаёт быть защитой: при утечке БД или ответа можно редактировать и удалять запись без знания исходного token.
 			tokenHash: true,
 		},
 	});
@@ -102,6 +106,7 @@ export const updateConfession = asyncHandler(async (req, res) => {
 	const tokenHash = req.body.tokenHash;
 	const body = { ...req.body };
 
+	// TODO: Нужно отдельно валидировать req.params.id как UUID и не отдавать управление формату API через исключения Prisma. Иначе часть ошибок будет 500 вместо предсказуемых 400/404.
 	if (!tokenHash) {
 		res.status(400);
 		throw new Error("Confession token hash required");
@@ -125,6 +130,7 @@ export const updateConfession = asyncHandler(async (req, res) => {
 		throw new Error("Confession token hash does not match");
 	}
 
+	// TODO: body содержит и tokenHash, и любые остальные поля пользователя, а дальше целиком идёт в update. Это прямой mass assignment и возможность менять технические поля модели.
 	const updated = await prisma.confession.update({
 		where: { id: confession.id },
 		data: body,
@@ -179,6 +185,7 @@ export const deleteConfession = asyncHandler(async (req, res) => {
 			where: { id: confessionId },
 		});
 
+		// TODO: Здесь дублируется ответственность schema.prisma: для ConfessionLike уже стоит onDelete: Cascade. Лишняя ручная очистка создаёт расхождение между кодом и схемой.
 		await tx.confessionLike.deleteMany({
 			where: {
 				confessionId: confessionId,
@@ -286,6 +293,7 @@ export const unlikeConfession = asyncHandler(async (req, res) => {
 			throw new Error("Confession not found");
 		}
 
+		// TODO: delete бросит исключение, если лайка уже нет или клиентский likedConfessions рассинхронизирован с сервером. Для публичного endpoint это должен быть идемпотентный сценарий, а не 500.
 		await tx.confessionLike.delete({
 			where: {
 				confessionId_voterHash: {
