@@ -13,7 +13,10 @@ const isDev = mode === "development";
 
 const plugins = [
 	new DefinePlugin({
-		"process.env": JSON.stringify(process.env),
+		"process.env.SERVER_URL": JSON.stringify(process.env.SERVER_URL ?? ""),
+		"process.env.NODE_ENV": JSON.stringify(
+			process.env.NODE_ENV ?? "development",
+		),
 	}),
 	new CleanWebpackPlugin(),
 	new HtmlWebpackPlugin({

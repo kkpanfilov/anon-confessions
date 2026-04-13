@@ -48,7 +48,15 @@ class Notifications {
 		notificationBlock.attr("data-state", "active");
 		if (type) notificationBlock.attr("data-notification-type", type);
 
-		// TODO: Кнопка close из шаблон не подключена
+		const closeButton = notificationBlock.find(
+			'button[data-id="notification-close"]',
+		);
+
+		closeButton.on("click", () => {
+			console.log("click");
+			notificationBlock.attr("data-state", "inactive");
+		});
+
 		this.#setTimeout(() => {
 			notificationBlock.attr("data-state", "inactive");
 		}, 5000);

@@ -28,17 +28,7 @@ export class Confession extends BaseScreen {
 
 	#renderConfession(htmlElement) {
 		const createdConfessions =
-			JSON.parse(this.storageService.getItem("createdConfessions")) || {};
-
-		if (createdConfessions[this.confessionId]) {
-			const editButton = $(htmlElement).find('button[data-id="edit-button"]');
-			const deleteButton = $(htmlElement).find(
-				'button[data-id="delete-button"]',
-			);
-
-			editButton.removeClass("hide");
-			deleteButton.removeClass("hide");
-		}
+			JSON.parse(this.storageService.getItem("createdConfessions")) || [];
 
 		this.confessionsService
 			.getConfessionById(this.confessionId)
@@ -64,6 +54,18 @@ export class Confession extends BaseScreen {
 							Math.round(new Date(confession.createdAt).getTime() / 1000),
 						),
 					);
+
+				if (createdConfessions.includes(this.confessionId)) {
+					const editButton = $(htmlElement).find(
+						'button[data-id="edit-button"]',
+					);
+					const deleteButton = $(htmlElement).find(
+						'button[data-id="delete-button"]',
+					);
+
+					editButton.removeClass("hide");
+					deleteButton.removeClass("hide");
+				}
 			});
 	}
 
@@ -149,35 +151,21 @@ export class Confession extends BaseScreen {
 	};
 
 	#handleDeleteButton = () => {
-		const createdConfessions = JSON.parse(
-			this.storageService.getItem("createdConfessions"),
-		);
-		const ownerToken = createdConfessions[this.confessionId];
+		this.confessionsService.deleteConfession(this.confessionId).then(result => {
+			if (!result) return;
 
-		if (!ownerToken) {
+			console.log("Delete confession result:", result);
+
 			this.notificationsService.show({
-				type: "error",
-				title: "Error",
-				message: "No permission to delete confession",
+				type: "success",
+				title: "Success",
+				message: "Confession deleted successfully",
 			});
-			return;
-		}
 
-		this.confessionsService
-			.deleteConfession(this.confessionId, ownerToken)
-			.then(result => {
-				if (!result) return;
-
-				this.notificationsService.show({
-					type: "success",
-					title: "Success",
-					message: "Confession deleted successfully",
-				});
-
-				setTimeout(() => {
-					window.location.href = "/feed";
-				}, 1000);
-			});
+			setTimeout(() => {
+				window.location.href = "/feed";
+			}, 1000);
+		});
 	};
 
 	#showEditForm = htmlElement => {
@@ -219,25 +207,11 @@ export class Confession extends BaseScreen {
 	#handleSaveButton = () => {
 		const data = this.formService.getFormData(this.htmlElement);
 
-		const createdConfessions = JSON.parse(
-			this.storageService.getItem("createdConfessions"),
-		);
-
-		const ownerToken = createdConfessions[this.confessionId];
-
-		// TODO: Сообщение и ветка прав здесь смешаны с delete-сценарием, а data не валидируется повторно после редактирования. В итоге edit path хрупкий и даёт путаную диагностику.
-		if (!ownerToken) {
-			this.notificationsService.show({
-				type: "error",
-				title: "Error",
-				message: "No permission to delete confession",
-			});
-			return;
-		}
-
 		this.confessionsService
-			.updateConfession(this.confessionId, data, ownerToken)
+			.updateConfession(this.confessionId, data)
 			.then(result => {
+				console.log("Edit confession result:", result);
+
 				if (result.message?.toLowerCase() === "confession updated") {
 					this.notificationsService.show({
 						type: "success",
@@ -254,7 +228,6 @@ export class Confession extends BaseScreen {
 	render() {
 		const htmlElement = renderService.htmlToElement(template, [], styles);
 
-		// TODO: После перевода карточки в form стоит либо вешать submit на форму, либо явно контролировать типы кнопок и валидацию. Сейчас save/edit/delete завязаны на click-обработчики и легко расходятся с семантикой формы.
 		this.#renderConfession(htmlElement);
 
 		const shareButton = $(htmlElement).find("button[data-id='share-button']");

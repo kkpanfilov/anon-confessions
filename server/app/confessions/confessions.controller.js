@@ -51,7 +51,6 @@ export const getConfessionById = asyncHandler(async (req, res) => {
 
 export const getRandomConfessions = asyncHandler(async (req, res) => {
 	const pivot = Math.random();
-	let confessions;
 
 	const first = await prisma.confession.findMany({
 		where: { randomKey: { gte: pivot } },
@@ -66,22 +65,23 @@ export const getRandomConfessions = asyncHandler(async (req, res) => {
 		},
 	});
 
-	if (first.length < 15) {
-		const second = await prisma.confession.findMany({
-			where: { randomKey: { lt: pivot } },
-			orderBy: { randomKey: "asc" },
-			take: 15 - first.length,
-			select: {
-				id: true,
-				title: true,
-				createdAt: true,
-				content: true,
-				likes: true,
-			},
-		});
+	const second =
+		first.length < 15
+			? await prisma.confession.findMany({
+					where: { randomKey: { lt: pivot } },
+					orderBy: { randomKey: "asc" },
+					take: 15 - first.length,
+					select: {
+						id: true,
+						title: true,
+						createdAt: true,
+						content: true,
+						likes: true,
+					},
+				})
+			: [];
 
-		confessions = [...first, ...second];
-	}
+	const confessions = [...first, ...second];
 
 	res.status(200).json(confessions);
 });
@@ -98,6 +98,12 @@ export const getRandomConfessions = asyncHandler(async (req, res) => {
 export const createConfession = asyncHandler(async (req, res) => {
 	const { title, content } = confessionSchema.body.parse(req.body);
 
+	let isUserHasOwnerToken = false;
+
+	if (req.signedCookies?.confession_owner_session) {
+		isUserHasOwnerToken = true;
+	}
+
 	if (!content) {
 		res.status(400);
 		throw new Error("Confession content required");
@@ -108,17 +114,30 @@ export const createConfession = asyncHandler(async (req, res) => {
 		throw new Error("Confession title required");
 	}
 
-	const token = generateToken();
-	const tokenHash = await argon2.hash(token);
+	const ownerToken = isUserHasOwnerToken
+		? req.signedCookies.confession_owner_session
+		: generateToken();
+	const ownerTokenHash = await argon2.hash(ownerToken);
 
 	const confession = await prisma.confession.create({
-		data: { title, content, tokenHash },
+		data: { title, content, ownerTokenHash },
 		select: {
 			id: true,
 		},
 	});
 
-	res.status(201).json({ id: confession.id, ownerToken: token });
+	if (!isUserHasOwnerToken) {
+		res.cookie("confession_owner_session", ownerToken, {
+			httpOnly: true,
+			signed: true,
+			sameSite: "strict",
+			secure: true,
+			maxAge: 1000 * 60 * 60 * 24 * 360,
+			path: "/",
+		});
+	}
+
+	res.status(201).json({ id: confession.id });
 });
 
 /**
@@ -132,20 +151,20 @@ export const createConfession = asyncHandler(async (req, res) => {
 
 export const updateConfession = asyncHandler(async (req, res) => {
 	const confessionId = confessionSchema.params.parse(req.params).id;
-	const ownerToken = req.body.ownerToken;
+	const ownerToken = req.signedCookies?.confession_owner_session;
 
 	const { title, content } = confessionSchema.body.parse(req.body);
 
 	if (!ownerToken) {
-		res.status(400);
-		throw new Error("Confession owner token hash required");
+		res.status(401);
+		throw new Error("Confession owner token required");
 	}
 
 	const confession = await prisma.confession.findUnique({
 		where: { id: confessionId },
 		select: {
 			id: true,
-			tokenHash: true,
+			ownerTokenHash: true,
 		},
 	});
 
@@ -154,7 +173,10 @@ export const updateConfession = asyncHandler(async (req, res) => {
 		throw new Error("Confession not found");
 	}
 
-	const isHashVerified = await argon2.verify(confession.tokenHash, ownerToken);
+	const isHashVerified = await argon2.verify(
+		confession.ownerTokenHash,
+		ownerToken,
+	);
 
 	if (!isHashVerified) {
 		res.status(403);
@@ -185,10 +207,10 @@ export const updateConfession = asyncHandler(async (req, res) => {
 
 export const deleteConfession = asyncHandler(async (req, res) => {
 	const confessionId = confessionSchema.params.parse(req.params).id;
-	const ownerToken = req.body.ownerToken;
+	const ownerToken = req.signedCookies?.confession_owner_session;
 
 	if (!ownerToken) {
-		res.status(400);
+		res.status(401);
 		throw new Error("Confession token hash required");
 	}
 
@@ -196,7 +218,7 @@ export const deleteConfession = asyncHandler(async (req, res) => {
 		where: { id: confessionId },
 		select: {
 			id: true,
-			tokenHash: true,
+			ownerTokenHash: true,
 		},
 	});
 
@@ -205,7 +227,10 @@ export const deleteConfession = asyncHandler(async (req, res) => {
 		throw new Error("Confession not found");
 	}
 
-	const isHashVerified = await argon2.verify(confession.tokenHash, ownerToken);
+	const isHashVerified = await argon2.verify(
+		confession.ownerTokenHash,
+		ownerToken,
+	);
 
 	if (!isHashVerified) {
 		res.status(403);
@@ -330,8 +355,8 @@ export const unlikeConfession = asyncHandler(async (req, res) => {
 				id: confession.id,
 				likes: confession.likes,
 				message: "Already unliked",
-				};
-			}
+			};
+		}
 
 		const decremented = await tx.confession.updateMany({
 			where: {

@@ -7,25 +7,17 @@ datasource db {
 }
 
 model Confession {
-  id        String   @id @default(uuid()) @db.Uuid
-  title     String   @db.VarChar(32)
-  content   String   @db.Text
-  // TODO: Сделать API строго идемпотентным: db-check: likes >= 0 + пофиксить ранний выход при unlike и likes === 0
-  /**
-   * /**
-   * /*
-   * unlike делает ранний выход при likes === 0, не проверяя фактическую запись в ConfessionLike: confessions.controller.js (line 321).
-   * Если счетчик уже разъехался, операция не “лечит” данные.
-   */
-  likes     Int      @default(0)
-  tokenHash String   @unique
-  randomKey Float    @default(dbgenerated("random()")) @map("random_key")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id             String   @id @default(uuid()) @db.Uuid
+  title          String   @db.VarChar(32)
+  content        String   @db.Text
+  likes          Int      @default(0)
+  ownerTokenHash String   @db.VarChar(128)
+  randomKey      Float    @default(dbgenerated("random()")) @map("random_key")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
 
   likedBy ConfessionLike[]
 
-  @check([likes >= 0], name: "likes_not_negative")
   @@index([randomKey])
   @@index([createdAt(sort: Desc)])
   @@index([likes(sort: Desc)])

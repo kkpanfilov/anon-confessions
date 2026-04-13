@@ -37,6 +37,8 @@ export class ConfessionsService {
 			return false;
 		}
 
+		id = id.trim();
+
 		const isUUID = this.validationService.validateUuid(id);
 
 		if (!isUUID) {
@@ -224,7 +226,7 @@ export class ConfessionsService {
 		return result.data;
 	}
 
-	async updateConfession(id, body, ownerToken) {
+	async updateConfession(id, body) {
 		const isValidId = this.#validateId(id);
 
 		if (!isValidId) return false;
@@ -238,7 +240,6 @@ export class ConfessionsService {
 			method: "PATCH",
 			body: {
 				...body,
-				ownerToken,
 			},
 		});
 
