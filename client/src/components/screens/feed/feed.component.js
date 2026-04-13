@@ -26,20 +26,19 @@ export class Feed extends BaseScreen {
 
 		feedList.clear();
 
-		this.confessionsService
-			.getRandomConfessions()
-			.then((list) => {
-				// TODO: Если API вернул undefined после ошибки, тут будет crash на list.length. UI должен уметь переживать неуспешный запрос без второго исключения поверх первого.
-				if (!list.length) {
-					feedList.append(emptyState);
-					return;
-				}
+		this.confessionsService.getRandomConfessions().then(list => {
+			if (!list) return;
 
-				list.forEach(confession => {
-					const confessionClone = new ConfessionItem(confession).render();
-					feedList.append(confessionClone);
-				});
+			if (!list.length) {
+				feedList.append(emptyState);
+				return;
+			}
+
+			list.forEach(confession => {
+				const confessionClone = new ConfessionItem(confession).render();
+				feedList.append(confessionClone);
 			});
+		});
 
 		return htmlElement;
 	}

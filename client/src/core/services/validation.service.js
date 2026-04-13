@@ -1,9 +1,8 @@
 class ValidationService {
-	// TODO: Валидация сейчас размазана по компонентам и серверу, а этот сервис почти не участвует в потоке. Пока правила не будут собраны в одном месте, front и back будут расходиться по ограничениям и ошибкам.
-	#EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-	#USERNAME_REGEX = /^[a-zA-Z0-9_]+$/;
-	#SLUG_REGEX = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-	#PHONE_REGEX = /^\+?[0-9\s\-()]{7,20}$/;
+	// TODO: Валидация сейчас размазана по компонентам и серверу, а этот сервис почти не участвует в потоке
+
+	#UUID_REGEX =
+		/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 	/**
 	 * Validate if a given string is non-empty.
@@ -178,81 +177,6 @@ class ValidationService {
 	}
 
 	/**
-	 * Validate email format.
-	 * @param {*} email email to validate.
-	 * @returns {boolean} true when email has valid format.
-	 */
-
-	validateEmail(email) {
-		const normalizedEmail = this.#normalizeString(email);
-		return this.#EMAIL_REGEX.test(normalizedEmail);
-	}
-
-	/**
-	 * Validate username format and length.
-	 * @param {*} username username to validate.
-	 * @param {Object} [options] username validation options.
-	 * @param {number} [options.minLength=3] minimum username length.
-	 * @param {number} [options.maxLength=30] maximum username length.
-	 * @returns {boolean} true when username matches constraints.
-	 */
-
-	validateUsername(username, { minLength = 3, maxLength = 30 } = {}) {
-		const normalizedUsername = this.#normalizeString(username);
-
-		if (!this.validateLengthRange(normalizedUsername, minLength, maxLength)) {
-			return false;
-		}
-
-		return this.#USERNAME_REGEX.test(normalizedUsername);
-	}
-
-	/**
-	 * Validate password complexity rules.
-	 * @param {*} password password to validate.
-	 * @param {Object} [options] password validation options.
-	 * @param {number} [options.minLength=8] minimum password length.
-	 * @param {boolean} [options.requireUppercase=true] require at least one uppercase letter.
-	 * @param {boolean} [options.requireLowercase=true] require at least one lowercase letter.
-	 * @param {boolean} [options.requireNumber=true] require at least one digit.
-	 * @param {boolean} [options.requireSpecialChar=false] require at least one special character.
-	 * @returns {boolean} true when password matches all enabled rules.
-	 */
-
-	validatePassword(
-		password,
-		{
-			minLength = 8,
-			requireUppercase = true,
-			requireLowercase = true,
-			requireNumber = true,
-			requireSpecialChar = false,
-		} = {},
-	) {
-		if (!this.validateMinLength(password, minLength)) {
-			return false;
-		}
-
-		if (requireUppercase && !/[A-Z]/.test(password)) {
-			return false;
-		}
-
-		if (requireLowercase && !/[a-z]/.test(password)) {
-			return false;
-		}
-
-		if (requireNumber && !/[0-9]/.test(password)) {
-			return false;
-		}
-
-		if (requireSpecialChar && !/[^a-zA-Z0-9]/.test(password)) {
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
 	 * Validate that value is an integer.
 	 * @param {*} value value to validate.
 	 * @returns {boolean} true when value is an integer number.
@@ -336,28 +260,6 @@ class ValidationService {
 	}
 
 	/**
-	 * Validate phone number format.
-	 * @param {*} phone phone value to validate.
-	 * @returns {boolean} true when phone matches allowed pattern.
-	 */
-
-	validatePhone(phone) {
-		const normalizedPhone = this.#normalizeString(phone);
-		return this.#PHONE_REGEX.test(normalizedPhone);
-	}
-
-	/**
-	 * Validate slug format.
-	 * @param {*} value slug value to validate.
-	 * @returns {boolean} true when value is a valid slug.
-	 */
-
-	validateSlug(value) {
-		const normalizedValue = this.#normalizeString(value);
-		return this.#SLUG_REGEX.test(normalizedValue);
-	}
-
-	/**
 	 * Validate date value.
 	 * @param {*} value date input as Date or string.
 	 * @returns {boolean} true when value can be parsed to a valid date.
@@ -377,31 +279,14 @@ class ValidationService {
 	}
 
 	/**
-	 * Validate that date value is within provided date range.
-	 * @param {*} value date value to validate.
-	 * @param {*} minDate minimum allowed date.
-	 * @param {*} maxDate maximum allowed date.
-	 * @returns {boolean} true when value is inside range.
+	 * Validate UUID string in canonical format.
+	 * @param {*} value value to validate.
+	 * @returns {boolean} true when value matches UUID format.
 	 */
 
-	validateDateRange(value, minDate, maxDate) {
-		if (
-			!this.validateDate(value) ||
-			!this.validateDate(minDate) ||
-			!this.validateDate(maxDate)
-		) {
-			return false;
-		}
-
-		const current = new Date(value).getTime();
-		const min = new Date(minDate).getTime();
-		const max = new Date(maxDate).getTime();
-
-		if (min > max) {
-			return false;
-		}
-
-		return current >= min && current <= max;
+	validateUuid(value) {
+		const normalizedValue = this.#normalizeString(value);
+		return Boolean(normalizedValue) && this.#UUID_REGEX.test(normalizedValue);
 	}
 
 	/**
@@ -424,26 +309,6 @@ class ValidationService {
 
 	validateMatch(value, targetValue) {
 		return value === targetValue;
-	}
-
-	/**
-	 * Validate checkbox checked state.
-	 * @param {*} value checkbox value.
-	 * @returns {boolean} true when checkbox is checked.
-	 */
-
-	validateCheckboxChecked(value) {
-		return value === true;
-	}
-
-	/**
-	 * Validate if a given form field is non-empty.
-	 * @param {Object} field the form field to validate.
-	 * @returns {boolean} true if the field is non-empty, false otherwise.
-	 */
-
-	validateNonEmptyField(field) {
-		return this.#validateNonEmptyString(field?.value);
 	}
 }
 

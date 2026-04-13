@@ -40,20 +40,20 @@ export class Add extends BaseScreen {
 		}
 
 		this.confessionsService.createConfession(data).then(result => {
+			if (!result) return;
+
 			notificationsService.show({
 				type: "success",
 				title: "Success",
 				message: "Confession created successfully",
 			});
 
-			console.log("result", result);
 			// TODO: Секрет владения хранится в localStorage. Для проекта без auth это допустимо только пока в приложении жёстко исключён XSS; иначе любой инъецированный скрипт мгновенно заберёт право редактировать и удалять записи.
 			const createdConfessions =
 				JSON.parse(this.storageService.getItem("createdConfessions")) || {};
 
 			createdConfessions[result.id] = result.ownerToken;
 
-			console.log("createdConfessions", createdConfessions);
 			this.storageService.setItem(
 				"createdConfessions",
 				JSON.stringify(createdConfessions),

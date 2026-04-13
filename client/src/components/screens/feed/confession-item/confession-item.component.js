@@ -22,10 +22,8 @@ export default class ConfessionItem extends ChildComponent {
 	}
 
 	render() {
-		// TODO: В шаблоне карточки button вложен в <a>, а ниже ещё остался console.log(this). Это и невалидная разметка, и debug-шум в production-коде.
 		this.element = renderService.htmlToElement(template, [], styles);
 
-		console.log(this)
 		$(this.element).attr("href", `/confession/${this.id}`);
 		$(this.element)
 			.find('div[data-id="confession-title"]')

@@ -44,19 +44,37 @@ export class Router {
 	}
 
 	#handleLinks() {
-		// TODO: Перехват ссылок одноразовый и без delegation. Ссылки, появившиеся после первого render/async load (карточки фида, back link), уходят в full page reload и ломают SPA-навигацию.
-		const allLinks = document.querySelectorAll("a");
+		document.addEventListener("click", e => {
+			if (
+				e.defaultPrevented ||
+				e.button !== 0 ||
+				e.metaKey ||
+				e.ctrlKey ||
+				e.shiftKey ||
+				e.altKey
+			) {
+				return;
+			}
 
-		for (const linkElem of allLinks) {
-			linkElem.addEventListener("click", e => {
-				e.preventDefault();
+			const linkElem = e.target.closest("a[href]");
 
-				const path = e.currentTarget.getAttribute("href");
-				window.history.pushState({}, "", path);
+			if (!linkElem) return;
+			if (linkElem.target && linkElem.target !== "_self") return;
+			if (linkElem.hasAttribute("download")) return;
 
-				this.#handleRouteChange();
-			});
-		}
+			const href = linkElem.getAttribute("href");
+			if (!href || href.startsWith("#")) return;
+
+			const url = new URL(href, window.location.origin);
+			if (url.origin !== window.location.origin) return;
+			if (url.pathname === window.location.pathname && url.search === window.location.search) {
+				return;
+			}
+
+			e.preventDefault();
+			window.history.pushState({}, "", `${url.pathname}${url.search}${url.hash}`);
+			this.#handleRouteChange();
+		});
 	}
 
 	#handlePopstate() {

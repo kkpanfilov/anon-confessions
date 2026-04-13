@@ -43,6 +43,8 @@ export class Confession extends BaseScreen {
 		this.confessionsService
 			.getConfessionById(this.confessionId)
 			.then(confession => {
+				if (!confession) return;
+
 				$(htmlElement)
 					.find('span[data-id="confession-id"]')
 					.text("#" + confession.id);
@@ -77,6 +79,8 @@ export class Confession extends BaseScreen {
 
 	#likeConfession = (htmlElement, likedConfessions, likeButton) => {
 		this.confessionsService.likeConfession(this.confessionId).then(result => {
+			if (!result) return;
+
 			if (result.message.includes("Successfully liked confession")) {
 				notificationsService.show({
 					type: "success",
@@ -108,6 +112,8 @@ export class Confession extends BaseScreen {
 
 	#unlikeConfession = (htmlElement, likedConfessions, likeButton) => {
 		this.confessionsService.unlikeConfession(this.confessionId).then(result => {
+			if (!result) return;
+
 			if (result.message.includes("Successfully unliked confession")) {
 				const unlikedConfession = likedConfessions.indexOf(this.confessionId);
 
@@ -159,7 +165,9 @@ export class Confession extends BaseScreen {
 
 		this.confessionsService
 			.deleteConfession(this.confessionId, ownerToken)
-			.then(() => {
+			.then(result => {
+				if (!result) return;
+
 				this.notificationsService.show({
 					type: "success",
 					title: "Success",
