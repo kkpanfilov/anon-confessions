@@ -1,13 +1,14 @@
 import asyncHandler from "express-async-handler";
 
+import argon2 from "argon2";
+import { generateToken } from "../utils/crypto/generateToken.js";
+import { hashToken } from "../utils/crypto/hashToken.js";
+
 import { env } from "../validations/env.validation.js";
 
 import { confessionSchema } from "../validations/confessions.validation.js";
 
 import { prisma } from "../prisma.js";
-
-import { generateToken } from "../utils/crypto/generateToken.js";
-import { hashToken } from "../utils/crypto/hashToken.js";
 
 /**
  * @description Get a confession by its id.
@@ -108,17 +109,16 @@ export const createConfession = asyncHandler(async (req, res) => {
 	}
 
 	const token = generateToken();
-	const tokenHash = hashToken(token);
+	const tokenHash = await argon2.hash(token);
 
 	const confession = await prisma.confession.create({
 		data: { title, content, tokenHash },
 		select: {
 			id: true,
-			tokenHash: true,
 		},
 	});
 
-	res.status(201).json(confession);
+	res.status(201).json({ id: confession.id, ownerToken: token });
 });
 
 /**
@@ -132,13 +132,13 @@ export const createConfession = asyncHandler(async (req, res) => {
 
 export const updateConfession = asyncHandler(async (req, res) => {
 	const confessionId = confessionSchema.params.parse(req.params).id;
-	const tokenHash = req.body.tokenHash;
+	const ownerToken = req.body.ownerToken;
 
 	const { title, content } = confessionSchema.body.parse(req.body);
 
-	if (!tokenHash) {
+	if (!ownerToken) {
 		res.status(400);
-		throw new Error("Confession token hash required");
+		throw new Error("Confession owner token hash required");
 	}
 
 	const confession = await prisma.confession.findUnique({
@@ -154,8 +154,10 @@ export const updateConfession = asyncHandler(async (req, res) => {
 		throw new Error("Confession not found");
 	}
 
-	if (confession.tokenHash !== tokenHash) {
-		res.status(401);
+	const isHashVerified = await argon2.verify(confession.tokenHash, ownerToken);
+
+	if (!isHashVerified) {
+		res.status(403);
 		throw new Error("Confession token hash does not match");
 	}
 
@@ -183,9 +185,9 @@ export const updateConfession = asyncHandler(async (req, res) => {
 
 export const deleteConfession = asyncHandler(async (req, res) => {
 	const confessionId = confessionSchema.params.parse(req.params).id;
-	const tokenHash = req.body.tokenHash;
+	const ownerToken = req.body.ownerToken;
 
-	if (!tokenHash) {
+	if (!ownerToken) {
 		res.status(400);
 		throw new Error("Confession token hash required");
 	}
@@ -203,8 +205,10 @@ export const deleteConfession = asyncHandler(async (req, res) => {
 		throw new Error("Confession not found");
 	}
 
-	if (confession.tokenHash !== tokenHash) {
-		res.status(401);
+	const isHashVerified = await argon2.verify(confession.tokenHash, ownerToken);
+
+	if (!isHashVerified) {
+		res.status(403);
 		throw new Error("Confession token hash does not match");
 	}
 
@@ -302,7 +306,7 @@ export const unlikeConfession = asyncHandler(async (req, res) => {
 
 	const result = await prisma.$transaction(async tx => {
 		const confession = await tx.confession.findUnique({
-			where: { id: req.params.id },
+			where: { id: confessionId },
 			select: {
 				id: true,
 				likes: true,
@@ -314,22 +318,57 @@ export const unlikeConfession = asyncHandler(async (req, res) => {
 			throw new Error("Confession not found");
 		}
 
-		// TODO: delete бросит исключение, если лайка уже нет или клиентский likedConfessions рассинхронизирован с сервером. Для публичного endpoint это должен быть идемпотентный сценарий, а не 500.
-		await tx.confessionLike.delete({
+		const deleted = await tx.confessionLike.deleteMany({
 			where: {
-				confessionId_voterHash: {
-					confessionId: confessionId,
-					voterHash: voterHash,
-				},
+				confessionId,
+				voterHash,
 			},
 		});
 
-		const updated = await tx.confession.update({
-			where: { id: confession.id },
+		if (deleted.count === 0) {
+			return {
+				id: confession.id,
+				likes: confession.likes,
+				message: "Already unliked",
+				};
+			}
+
+		const decremented = await tx.confession.updateMany({
+			where: {
+				id: confession.id,
+				likes: {
+					gt: 0,
+				},
+			},
 			data: {
 				likes: {
 					decrement: 1,
 				},
+			},
+		});
+
+		if (decremented.count === 1) {
+			const updated = await tx.confession.findUnique({
+				where: { id: confession.id },
+				select: {
+					id: true,
+					likes: true,
+				},
+			});
+
+			return { ...updated, message: "Successfully unliked confession" };
+		}
+
+		const actualLikes = await tx.confessionLike.count({
+			where: {
+				confessionId,
+			},
+		});
+
+		const reconciled = await tx.confession.update({
+			where: { id: confession.id },
+			data: {
+				likes: actualLikes,
 			},
 			select: {
 				id: true,
@@ -337,7 +376,10 @@ export const unlikeConfession = asyncHandler(async (req, res) => {
 			},
 		});
 
-		return { ...updated, message: "Successfully unliked confession" };
+		return {
+			...reconciled,
+			message: "Successfully unliked confession (counter reconciled)",
+		};
 	});
 
 	res.status(200).json(result);

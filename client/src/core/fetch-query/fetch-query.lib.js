@@ -15,7 +15,7 @@ import NotificationsService from "../services/notifications.service.js";
  * @param {Object} [options.headers={}] - Additional headers to include with the request.
  * @param {Function} [options.onSuccess=null] - Callback function to be called on successful response.
  * @param {Function} [options.onError=null] - Callback function to be called on error response.
- * @returns {Promise<{isLoading: boolean, error: string|null, data: any|null}>} - An object containing the loading state, error, and data from the response.
+ * @returns {Promise<{ok: boolean, status: number, error: string|null, data: any|null}>} - An object containing the loading state, error, and data from the response.
  */
 
 export async function FetchQuery({
@@ -26,11 +26,11 @@ export async function FetchQuery({
 	onSuccess = null,
 	onError = null,
 }) {
-	let isLoading = true;
+	let ok;
+	let status = null;
 	let error = null;
 	let data = null;
 
-	// TODO: Контракт функции размыт: error почти не используется, caller вынужден гадать успех по data, а линтер уже ловит мёртвые состояния. Выбери одно: либо бросать исключения, либо возвращать нормальный result-object с заполненным error.
 	const url = `${SERVER_URL}/api${path}`;
 
 	const requestOptions = {
@@ -50,16 +50,22 @@ export async function FetchQuery({
 
 	try {
 		const response = await fetch(url, requestOptions);
+		status = response.status;
 
 		if (response.ok) {
+			ok = true;
 			data = await response.json();
 
 			if (onSuccess) onSuccess(data);
 		} else {
+			ok = false;
+
 			const errorData = await response.json();
 			const errorMessage = extractMessageError(errorData);
 
 			if (onError) onError(errorMessage);
+
+			error = errorMessage;
 
 			notificationService.show({
 				type: "error",
@@ -68,18 +74,22 @@ export async function FetchQuery({
 			});
 		}
 	} catch (errorData) {
+		ok = false;
+
 		const errorMessage = extractMessageError(errorData);
 
 		if (onError) onError(errorMessage);
+
+		error = errorMessage;
 
 		notificationService.show({
 			type: "error",
 			title: "Error",
 			message: errorMessage,
 		});
-	} finally {
-		isLoading = false;
 	}
 
-	return { isLoading, error, data };
+	const result = { ok, status, error, data };
+
+	return result;
 }

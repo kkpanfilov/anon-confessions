@@ -68,13 +68,13 @@ export class ConfessionsService {
 		return data;
 	}
 
-	async updateConfession(id, body, tokenHash) {
+	async updateConfession(id, body, ownerToken) {
 		const result = await FetchQuery({
 			path: `${this.#BASE_URL}/${id}`,
 			method: "PATCH",
 			body: {
 				...body,
-				tokenHash,
+				ownerToken,
 			},
 		});
 
@@ -91,11 +91,11 @@ export class ConfessionsService {
 		return data;
 	}
 
-	async deleteConfession(id, tokenHash) {
+	async deleteConfession(id, ownerToken) {
 		const result = await FetchQuery({
 			path: `${this.#BASE_URL}/${id}`,
 			method: "DELETE",
-			body: { tokenHash },
+			body: { ownerToken },
 		});
 
 		const data = result.data;

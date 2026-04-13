@@ -2,15 +2,15 @@ import { BaseScreen } from "@/core/component/base-screen.component.js";
 import renderService from "@/core/services/render.service.js";
 import notificationsService from "@/core/services/notifications.service.js";
 import storageService from "@/core/services/storage.service.js";
+import formService from "@/core/services/form.service.js";
 import { ConfessionsService } from "@/api/confessions.service.js";
+
+import { timeAgo } from "@/utils/timeAgo.util.js";
 
 import { $ } from "@/core/jquery/jquery.lib.js";
 
 import styles from "./confession.module.scss";
 import template from "./confession.template.html";
-
-import { timeAgo } from "@/utils/timeAgo.util.js";
-import formService from "@/core/services/form.service.js";
 
 export class Confession extends BaseScreen {
 	constructor() {
@@ -27,11 +27,9 @@ export class Confession extends BaseScreen {
 	}
 
 	#renderConfession(htmlElement) {
-		const createdConfessions = JSON.parse(
-			this.storageService.getItem("createdConfessions"),
-		);
+		const createdConfessions =
+			JSON.parse(this.storageService.getItem("createdConfessions")) || {};
 
-		// TODO: JSON.parse(null) даёт null, и доступ createdConfessions[this.confessionId] валит экран у пользователя, который просто открыл confession, но сам его не создавал.
 		if (createdConfessions[this.confessionId]) {
 			const editButton = $(htmlElement).find('button[data-id="edit-button"]');
 			const deleteButton = $(htmlElement).find(
@@ -79,44 +77,59 @@ export class Confession extends BaseScreen {
 
 	#likeConfession = (htmlElement, likedConfessions, likeButton) => {
 		this.confessionsService.likeConfession(this.confessionId).then(result => {
-			// TODO: Клиент безусловно показывает success и пушит id в localStorage, даже если сервер ответил "Already liked". Источник истины расходится, а unlike потом может закончиться 500.
-			notificationsService.show({
-				type: "success",
-				title: "Success",
-				message: "Confession liked successfully",
-			});
+			if (result.message.includes("Successfully liked confession")) {
+				notificationsService.show({
+					type: "success",
+					title: "Success",
+					message: "Confession liked successfully",
+				});
 
-			likedConfessions.push(this.confessionId);
+				likedConfessions.push(this.confessionId);
 
-			this.storageService.setItem(
-				"likedConfessions",
-				JSON.stringify(likedConfessions),
-			);
+				this.storageService.setItem(
+					"likedConfessions",
+					JSON.stringify(likedConfessions),
+				);
 
-			$(htmlElement)
-				.find('span[data-id="confession-likes"]')
-				.text(String(result.likes));
+				$(htmlElement)
+					.find('span[data-id="confession-likes"]')
+					.text(String(result.likes));
 
-			likeButton.attr("data-status", "liked");
+				likeButton.attr("data-status", "liked");
+			} else {
+				notificationsService.show({
+					type: "error",
+					title: "Error",
+					message: result,
+				});
+			}
 		});
 	};
 
 	#unlikeConfession = (htmlElement, likedConfessions, likeButton) => {
 		this.confessionsService.unlikeConfession(this.confessionId).then(result => {
-			const unlikedConfession = likedConfessions.indexOf(this.confessionId);
+			if (result.message.includes("Successfully unliked confession")) {
+				const unlikedConfession = likedConfessions.indexOf(this.confessionId);
 
-			likedConfessions.splice(unlikedConfession, 1);
+				likedConfessions.splice(unlikedConfession, 1);
 
-			this.storageService.setItem(
-				"likedConfessions",
-				JSON.stringify(likedConfessions),
-			);
+				this.storageService.setItem(
+					"likedConfessions",
+					JSON.stringify(likedConfessions),
+				);
 
-			$(htmlElement)
-				.find('span[data-id="confession-likes"]')
-				.text(String(result.likes));
+				$(htmlElement)
+					.find('span[data-id="confession-likes"]')
+					.text(String(result.likes));
 
-			likeButton.attr("data-status", "unliked");
+				likeButton.attr("data-status", "unliked");
+			} else {
+				notificationsService.show({
+					type: "error",
+					title: "Error",
+					message: result,
+				});
+			}
 		});
 	};
 
@@ -133,9 +146,9 @@ export class Confession extends BaseScreen {
 		const createdConfessions = JSON.parse(
 			this.storageService.getItem("createdConfessions"),
 		);
-		const tokenHash = createdConfessions[this.confessionId];
+		const ownerToken = createdConfessions[this.confessionId];
 
-		if (!tokenHash) {
+		if (!ownerToken) {
 			this.notificationsService.show({
 				type: "error",
 				title: "Error",
@@ -145,7 +158,7 @@ export class Confession extends BaseScreen {
 		}
 
 		this.confessionsService
-			.deleteConfession(this.confessionId, tokenHash)
+			.deleteConfession(this.confessionId, ownerToken)
 			.then(() => {
 				this.notificationsService.show({
 					type: "success",
@@ -175,13 +188,16 @@ export class Confession extends BaseScreen {
 
 		confessionTitle.element.value = confessionTitleValue;
 
-		// TODO: Необходимо оставлять лишь кнопку Save на панели задач. Убрать Share и Like
+		const likeButton = $(htmlElement).find("button[data-id='like-button']");
 		const editButton = $(htmlElement).find('button[data-id="edit-button"]');
 		const deleteButton = $(htmlElement).find('button[data-id="delete-button"]');
+		const shareButton = $(htmlElement).find("button[data-id='share-button']");
 		const saveButton = $(htmlElement).find('button[data-id="save-button"]');
 
+		likeButton.addClass("hide");
 		editButton.addClass("hide");
 		deleteButton.addClass("hide");
+		shareButton.addClass("hide");
 		saveButton.removeClass("hide");
 
 		confessionItem.changeTag("form");
@@ -198,10 +214,11 @@ export class Confession extends BaseScreen {
 		const createdConfessions = JSON.parse(
 			this.storageService.getItem("createdConfessions"),
 		);
-		const tokenHash = createdConfessions[this.confessionId];
+
+		const ownerToken = createdConfessions[this.confessionId];
 
 		// TODO: Сообщение и ветка прав здесь смешаны с delete-сценарием, а data не валидируется повторно после редактирования. В итоге edit path хрупкий и даёт путаную диагностику.
-		if (!tokenHash) {
+		if (!ownerToken) {
 			this.notificationsService.show({
 				type: "error",
 				title: "Error",
@@ -211,7 +228,7 @@ export class Confession extends BaseScreen {
 		}
 
 		this.confessionsService
-			.updateConfession(this.confessionId, data, tokenHash)
+			.updateConfession(this.confessionId, data, ownerToken)
 			.then(result => {
 				if (result.message?.toLowerCase() === "confession updated") {
 					this.notificationsService.show({

@@ -10,9 +10,14 @@ model Confession {
   id        String   @id @default(uuid()) @db.Uuid
   title     String   @db.VarChar(32)
   content   String   @db.Text
-  // TODO: likes хранится денормализованно относительно ConfessionLike. Пока API не станет строго идемпотентным и атомарным, счётчик рано или поздно разъедется с таблицей лайков.
+  // TODO: Сделать API строго идемпотентным: db-check: likes >= 0 + пофиксить ранний выход при unlike и likes === 0
+  /**
+   * /**
+   * /*
+   * unlike делает ранний выход при likes === 0, не проверяя фактическую запись в ConfessionLike: confessions.controller.js (line 321).
+   * Если счетчик уже разъехался, операция не “лечит” данные.
+   */
   likes     Int      @default(0)
-  // TODO: tokenHash сейчас одновременно и "хеш", и клиентский секрет владения. Это слабая модель: при утечке БД поле уже можно использовать как credential без знания исходного token.
   tokenHash String   @unique
   randomKey Float    @default(dbgenerated("random()")) @map("random_key")
   createdAt DateTime @default(now()) @map("created_at")
@@ -20,6 +25,7 @@ model Confession {
 
   likedBy ConfessionLike[]
 
+  @check([likes >= 0], name: "likes_not_negative")
   @@index([randomKey])
   @@index([createdAt(sort: Desc)])
   @@index([likes(sort: Desc)])

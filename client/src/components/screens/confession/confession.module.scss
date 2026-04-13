@@ -176,6 +176,7 @@
 					flex-wrap: wrap;
 					justify-content: flex-end;
 					gap: 10px;
+					width: 100%;
 
 					@media (max-width: 600px) {
 						& {
@@ -215,7 +216,7 @@
 					}
 
 					&-button[data-id="save-button"] {
-						width: 150px;
+						width: 100%;
 					}
 
 					&-button[data-id="delete-button"] {

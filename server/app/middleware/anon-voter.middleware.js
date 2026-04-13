@@ -16,8 +16,8 @@ export function ensureAnonVoter(req, res, next) {
 
 	if (!anonVoterId) {
 		const token = generateToken();
-
 		req.anonVoterId = token;
+
 		res.cookie(COOKIE_NAME, token, {
 			httpOnly: true,
 			signed: true,
@@ -26,6 +26,8 @@ export function ensureAnonVoter(req, res, next) {
 			maxAge: 1000 * 60 * 60 * 24 * 180,
 			path: "/",
 		});
+	} else {
+		req.anonVoterId = anonVoterId;
 	}
 
 	next();
